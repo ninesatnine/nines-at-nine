@@ -1,36 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nines at Nine — Waitlist site
 
-## Getting Started
+A mobile-first waitlist site with three legal pages. Built with Next.js 16 (App Router) and TypeScript.
 
-First, run the development server:
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev -- -p 3107   # http://localhost:3107
+npm run build            # static export to out/
+npm run lint
+npm test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pages
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Route | What it is |
+| --- | --- |
+| `/` | Landing page — hero, portrait reel, the experience, how it works, questions, waitlist form. On a successful sign-up the same route swaps to the confirmation view with the waitlist card. |
+| `/terms` | Terms of Use, 26 clauses, with a contents list. |
+| `/privacy` | Privacy Policy, 18 clauses, under India's DPDP Act, 2023. |
+| `/house-rules` | House Rules — the four short rules, four stages of the evening, and what happens when a rule is broken. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All four are prerendered as static HTML.
 
-## Learn More
+## The waitlist form
 
-To learn more about Next.js, take a look at the following resources:
+Every field is required: first name, email, a city from the list, and the 18+/updates checkbox.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Validation lives in `src/lib/waitlist.ts`, shared with the parked server route.
+- City is a combobox over `src/lib/cities.ts`. It matches older names too — typing "Bangalore" finds Bengaluru, "Bombay" finds Mumbai — and free text that is not a city on the list is rejected.
+- A hidden honeypot field (`#website`) silently drops bot submissions.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Page one sends nothing.** The register API needs gender and age too, so the three fields are held in the browser and handed to the card. Submitting only validates and moves on.
 
-## Deploy on Vercel
+## The confirmation card, and the register API
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+After joining, the page shows a ticket with the name and city. The place in line is blank until the entry is registered.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Adding gender and age unlocks **Save your card**, which:
+
+1. `POST`s the whole entry to the register API (`src/lib/register.ts`),
+2. takes `count` from the response as the place in line,
+3. draws the ticket to a canvas at 1080×1440 and downloads it as a PNG.
+
+If the API rejects the entry, its own message is shown in a toast and nothing is downloaded.
+
+```http
+POST https://qab324zxc9.execute-api.ap-south-1.amazonaws.com/register
+Content-Type: application/json
+
+{ "name": "Aanya", "email": "aanya@example.com", "gender": "female", "age": "27", "city": "Bengaluru" }
+```
+
+| Case | Response |
+| --- | --- |
+| New email | `201 {"status":"created","count":255,"createdAt":"..."}` |
+| Same email again | `200 {"status":"updated","count":255,...}` — same count, so repeat saves are safe |
+| Any field missing | `400 {"error":"name, email, gender, age and city are required"}` |
+| Gender outside the enum | `400 {"error":"gender must be one of: male, female, other"}` |
+
+Both 201 and 200 count as success. `gender` must be `male`, `female` or `other`, so the four chips map onto three values — **"Non-binary" and "Prefer not to say" both send `other`**.
+
+Override the endpoint with `NEXT_PUBLIC_REGISTER_URL` (read at build time, since the site is a static export).
+
+### Why the request says `Content-Type: text/plain`
+
+The body is JSON, but the header is not, on purpose. The API answers the POST with `access-control-allow-origin: *`, but it has **no OPTIONS route** — a preflight returns 404. `application/json` is not a CORS-safelisted content type, so it forces a preflight, which fails, and the browser blocks the POST before it is ever sent. (curl never sees this, because curl does not enforce CORS.) `text/plain` is safelisted, so the request goes straight through, and the API parses the body regardless of the header.
+
+**Fix it properly by adding an OPTIONS handler to the API**, returning `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods: POST` and `Access-Control-Allow-Headers: content-type`. Then change the header back to `application/json` in `src/lib/register.ts`.
+
+## Deploying to Netlify (static, drag-and-drop)
+
+The site is a static export (`output: "export"` in `next.config.ts`), with no Node server.
+
+```bash
+npm run build:zip    # builds to out/ and zips it to nines-at-nine-site.zip
+```
+
+Go to https://app.netlify.com/drop and drag in `nines-at-nine-site.zip` (or the `out/` folder).
+
+## The parked webhook route (superseded)
+
+Sign-ups now go straight to the register API above, so nothing here is wired up. This section describes the older server-side route, kept in case you want a proxy in front of the API rather than calling it from the browser.
+
+The route is parked at `backend-later/waitlist-route.ts` and its storage adapter at `src/lib/waitlist-store.ts`. It validates on the server with the same rules as the form, normalizes the email, checks the honeypot, applies a per-IP rate limit, then hands the entry to the adapter — a webhook to a URL you control. Restoring it needs a Netlify Function or a Node host; a static export cannot serve it.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `WAITLIST_WEBHOOK_URL` | yes | Endpoint that stores the entry. |
+| `WAITLIST_WEBHOOK_SECRET` | no | Sent as `Authorization: Bearer <secret>`. |
+
+Copy `.env.example` to `.env.local` and fill it in. Both are read on the server only.
+
+### Webhook contract
+
+```http
+POST $WAITLIST_WEBHOOK_URL
+Content-Type: application/json
+Authorization: Bearer $WAITLIST_WEBHOOK_SECRET
+
+{ "firstName": "Aanya", "email": "aanya@example.com", "city": "Bengaluru", "consent": true, "submittedAt": "2026-09-22T10:00:00.000Z" }
+```
+
+| Your response | Meaning |
+| --- | --- |
+| `200` / `201` | Stored. |
+| `409` | That email is already on the list. |
+| Anything else, or no reply within 8 seconds | Error; the user's details stay in the form so they can retry. |
+
+Every field is non-empty by the time it reaches you. The app does not send a confirmation email; send it from your webhook if you want one.
+
+To use a database directly instead, implement the `WaitlistStore` interface and return it from `getWaitlistStore()`.
+
+## Project map
+
+| Path | What it holds |
+| --- | --- |
+| `src/app/page.tsx` | The landing page, and the swap to the confirmation view |
+| `src/app/terms`, `src/app/privacy`, `src/app/house-rules` | The three legal pages |
+| `src/app/globals.css` | The whole design system: colours, type, aurora background, and every component's styles |
+| `src/components/Doc.tsx` | Shared legal-page pieces: head, contents, clause, callout, table |
+| `src/components/ConfirmationView.tsx` | The waitlist card and its PNG export |
+| `src/components/WaitlistForm.tsx`, `CityCombobox.tsx` | The form and the city picker |
+| `src/components/Header.tsx`, `Footer.tsx`, `Dock.tsx`, `Aurora.tsx`, `Reel.tsx`, `Faq.tsx`, `Ornaments.tsx`, `Toast.tsx` | Site chrome and page furniture |
+| `src/lib/register.ts` | The register API client, and the gender mapping |
+| `src/lib/cities.ts` | The 135 cities a room can open in, with their older names |
+| `src/lib/company.ts` | Company identity and document version, used by the footer and every legal page |
+| `public/img/` | The logo and the sixteen reel portraits |
+
+## Design tokens
+
+Colours: oxblood `#290D10`, deep `#1D080B`, burgundy `#571B23`, gold `#F4C469`, antique `#B98A45`, ivory `#F6EBDC`. Fonts: Poiret One (display) and Josefin Sans (body), loaded through `next/font`.
+
+## Portraits
+
+The reel uses `public/img/m01.jpg`–`m16.jpg`, listed in `PHOTOS` in `src/components/Reel.tsx`. They are shown in grayscale and drift right to left on a 150-second loop; the loop pauses for visitors with "reduce motion" turned on.
+
+**Before launch:** confirm you hold a licence for each photograph.
+
+## Tests
+
+`npm test` runs Vitest + React Testing Library (44 tests) and writes a JUnit report to `test-results/junit.xml`. Coverage: validation rules, the city list and its alias matching, the combobox's keyboard and mouse behaviour, the form's required-field and honeypot handling, the register client (payload mapping, 201/200, error passthrough, network failure), and the save flow end to end (nothing sent on page one, posts on save, number taken from the response, download named after it, no download when rejected).

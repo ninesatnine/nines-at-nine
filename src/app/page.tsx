@@ -1,69 +1,131 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+
+import { ConfirmationView } from "@/components/ConfirmationView";
+import { Dock } from "@/components/Dock";
+import { Faq } from "@/components/Faq";
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { DiamondRule, SectionRule, StepMark } from "@/components/Ornaments";
+import { Reel } from "@/components/Reel";
+import { type Joined, WaitlistForm } from "@/components/WaitlistForm";
+
+const FACTS = [
+  { title: "Nine dates", body: "A chance to meet someone beyond a profile." },
+  { title: "Three minutes each", body: "Enough to start a conversation. Enough to get curious." },
+  { title: "One Friday", body: "Make room for something different." },
+];
+
+const STEPS = [
+  { title: "One Photograph", body: "Because first impressions matter here." },
+  { title: "One Line", body: "Not a bio. One line that sounds like you." },
+  {
+    title: "Then, We Take a Look",
+    body: "Every application is reviewed. The room is selected, not filled.",
+  },
+];
 
 export default function Home() {
+  const [joined, setJoined] = useState<Joined | null>(null);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+    <>
+      <Header hideNav={Boolean(joined)} />
+      <main id="main">
+        {joined ? (
+          <ConfirmationView joined={joined} onBack={() => setJoined(null)} />
+        ) : (
+          <>
+            <div className="wrap hero" id="top">
+              <Image className="mark" src="/img/logo.png" alt="" width={186} height={240} priority />
+              <h1>
+                The Best-Looking
+                <br />
+                Room in the City.
+              </h1>
+              <DiamondRule />
+              <p className="lede">Nine dates. One Friday. Three minutes each.</p>
+              <a className="btn" id="heroCta" href="#waitlist">
+                Join the waitlist
+              </a>
+              <small>An invitation starts here.</small>
+            </div>
+
+            <Reel />
+
+            <div className="wrap">
+              <SectionRule marginTop={56} />
+
+              <section className="block" id="experience" aria-labelledby="expH">
+                <div className="block-head">
+                  <span className="eyebrow">The experience</span>
+                  <h2 id="expH">Hot or Not? We’ll Decide.</h2>
+                  <p>Eighteen People. All Verified. No Swiping Required.</p>
+                </div>
+                <div className="trio">
+                  {FACTS.map((fact) => (
+                    <div key={fact.title}>
+                      <h3>{fact.title}</h3>
+                      <p>{fact.body}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              <SectionRule />
+
+              <section className="block" id="how-it-works" aria-labelledby="howH">
+                <div className="block-head">
+                  <span className="eyebrow">How it works</span>
+                  <h2 id="howH">Not Everyone Gets In.</h2>
+                  <p>
+                    The room gets picked, not filled. Joining the waitlist gives you the chance to
+                    apply when your city opens.
+                  </p>
+                </div>
+                <ol className="steps">
+                  {STEPS.map((step, i) => (
+                    <li className="step" key={step.title}>
+                      <StepMark number={i + 1} />
+                      <h3>
+                        <span className="sr-only">Step {i + 1}: </span>
+                        {step.title}
+                      </h3>
+                      <p>{step.body}</p>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+
+              <SectionRule />
+
+              <section className="block" id="questions" aria-labelledby="faqH">
+                <div className="block-head">
+                  <span className="eyebrow">Questions</span>
+                  <h2 id="faqH">Before You Ask.</h2>
+                </div>
+                <Faq />
+              </section>
+
+              <SectionRule />
+
+              <section className="join" id="waitlist" aria-labelledby="joinH">
+                <Image className="mark" src="/img/logo.png" alt="" width={186} height={240} />
+                <h2 id="joinH">Think You Belong in the Room?</h2>
+                <p className="muted" style={{ maxWidth: 440 }}>
+                  There’s only one way to find out.
+                </p>
+                <DiamondRule />
+                <WaitlistForm onJoined={setJoined} />
+              </section>
+            </div>
+          </>
+        )}
       </main>
-    </div>
+      <Footer />
+      <Dock active={!joined} />
+    </>
   );
 }
