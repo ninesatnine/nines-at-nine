@@ -7,7 +7,7 @@ export const COMPANY = {
   gstin: "19AAKCT8808L1ZJ",
   address: "3A, 38N, New Santoshpur Main Road, Kolkata – 700075, West Bengal, India",
   email: "admin@ninesatnine.com",
-  helpEmail: "help@ninesatnine.co",
+  helpEmail: "help@ninesatnine.com",
   grievanceOfficer: "Nilabja Datta",
   grievanceTitle: "Co-founder & Grievance Officer",
   hours: "Monday–Friday, 10:00–18:00 IST",
