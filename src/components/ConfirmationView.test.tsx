@@ -72,7 +72,9 @@ async function complete(user: ReturnType<typeof userEvent.setup>) {
 
 describe("ConfirmationView", () => {
   const submit = () => screen.getByRole("button", { name: /Submit/ });
-  const saveBtn = () => screen.getByRole("button", { name: /Save your card/ });
+  // Two ways to save once revealed: the main button, and the icon in the card's corner.
+  const saveBtn = () => screen.getByRole("button", { name: "Save your card" });
+  const cornerSave = () => screen.getByRole("button", { name: "Save your card as an image" });
 
   it("covers the card until the entry is registered", () => {
     render(<ConfirmationView joined={joined} onBack={() => {}} />);
@@ -112,6 +114,7 @@ describe("ConfirmationView", () => {
     expect(screen.getByText("Nº 255")).toBeTruthy();
     expect(screen.getByText("CARD COMPLETE")).toBeTruthy();
     expect(saveBtn()).toBeTruthy();
+    expect(cornerSave()).toBeTruthy();
 
     // Submitting did not download anything on its own.
     expect(clicks).toHaveLength(0);
@@ -126,6 +129,20 @@ describe("ConfirmationView", () => {
     await waitFor(() => expect(screen.getByText("Nº 255")).toBeTruthy());
 
     await user.click(saveBtn());
+
+    await waitFor(() => expect(clicks).toHaveLength(1));
+    expect(clicks[0].download).toBe("nines-at-nine-card-255.png");
+  });
+
+  it("downloads from the icon in the card's corner too", async () => {
+    const user = userEvent.setup();
+    mockFetch({ status: "created", count: 255 }, 201);
+    render(<ConfirmationView joined={joined} onBack={() => {}} />);
+    await complete(user);
+    await user.click(submit());
+    await waitFor(() => expect(screen.getByText("Nº 255")).toBeTruthy());
+
+    await user.click(cornerSave());
 
     await waitFor(() => expect(clicks).toHaveLength(1));
     expect(clicks[0].download).toBe("nines-at-nine-card-255.png");

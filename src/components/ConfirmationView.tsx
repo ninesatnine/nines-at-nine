@@ -125,7 +125,28 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
 
       <div className="confirm-grid">
         <div className={`ticket${revealed ? " revealed" : ""}`} aria-label="Your waitlist card">
-          {revealed ? null : (
+          {revealed ? (
+            <button
+              type="button"
+              className="ticket-save"
+              onClick={saveCard}
+              disabled={busy}
+              aria-label={busy ? "Saving your card" : "Save your card as an image"}
+              title={busy ? "Saving\u2026" : "Save your card"}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+              </svg>
+            </button>
+          ) : (
             <div className="ticket-veil">
               <svg
                 viewBox="0 0 24 24"
@@ -296,7 +317,7 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
                 : busy && !revealed
                   ? "Sending your details…"
                   : revealed
-                    ? "Saves as an image to your device."
+                    ? ""
                     : "Submit to reveal your card."}
             </p>
             <button type="button" className="back" onClick={onBack}>

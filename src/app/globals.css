@@ -190,8 +190,18 @@ section.block{padding-block:72px;text-align:center}
 .ticket-veil p{margin:0;font-family:var(--display);font-size:clamp(21px,2.4vw,26px);line-height:1.25;
   color:var(--gold-soft);text-wrap:balance;max-width:20ch}
 .ticket.revealed .ticket-in{animation:uncover .55s cubic-bezier(.2,.8,.2,1)}
+/* Save the card from the card itself. Arrives with the reveal. */
+.ticket-save{position:absolute;top:20px;right:20px;z-index:4;width:38px;height:38px;padding:0;
+  display:flex;align-items:center;justify-content:center;border-radius:10px;cursor:pointer;
+  border:1px solid var(--antique);background:rgba(41,13,16,.78);color:var(--gold);
+  transition:background .2s,color .2s,border-color .2s}
+.ticket-save svg{width:18px;height:18px}
+.ticket-save:hover:not(:disabled){background:var(--gold);color:var(--deep);border-color:var(--gold)}
+.ticket-save:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.ticket-save:disabled{opacity:.5;cursor:default}
+.ticket.revealed .ticket-save{animation:uncover .55s cubic-bezier(.2,.8,.2,1)}
 @keyframes uncover{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.ticket.revealed .ticket-in{animation:none}}
+@media (prefers-reduced-motion:reduce){.ticket.revealed .ticket-in,.ticket.revealed .ticket-save{animation:none}}
 .ticket-in{border:1px solid var(--gold);border-radius:3px;background:var(--deep);padding:30px 30px 24px;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;overflow:hidden}
 .ticket-in::before,.ticket-in::after{content:"";position:absolute;width:22px;height:22px;border:1px solid var(--antique);border-radius:50%;top:118px;background:var(--oxblood)}
 .ticket-in::before{left:-12px}.ticket-in::after{right:-12px}

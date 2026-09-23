@@ -33,7 +33,7 @@ All four prerender as static HTML.
 6. **Footer:** wordmark, legal links, contact, company line
 
 ### Confirmation view (`src/components/ConfirmationView.tsx`)
-Joining swaps the landing page for a waitlist card, covered by an opaque panel reading "Complete the rest of the details to reveal your card." The header nav is blanked here. Picking a gender chip and typing an age arms **Submit**, which registers the entry (`src/lib/register.ts`) and, on success, lifts the cover to show the ticket — name, city, gender, age and the place in line the API returned, stamped CARD COMPLETE. The button then becomes **Save your card**, which draws the ticket to a 1080×1440 canvas and downloads it as a PNG. A toast confirms the save, or carries the API's error if the submit was rejected.
+Joining swaps the landing page for a waitlist card, covered by an opaque panel reading "Complete the rest of the details to reveal your card." The header nav is blanked here. Picking a gender chip and typing an age arms **Submit**, which registers the entry (`src/lib/register.ts`) and, on success, lifts the cover to show the ticket — name, city, gender, age and the place in line the API returned, stamped CARD COMPLETE. The button then becomes **Save your card**, which draws the ticket to a 1080×1440 canvas and downloads it as a PNG; a square download icon in the card's top-right corner does the same. A toast confirms the save, or carries the API's error if the submit was rejected.
 
 ### Design system (`src/app/globals.css`)
 - Colours: oxblood `#290D10`, deep `#1D080B`, burgundy `#571B23`, glow `#74372F`, gold `#F4C469`, gold-soft, antique, ivory, muted, error.
@@ -73,6 +73,21 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 ---
 
 ## Change log
+
+### 2026-09-23 (later) — a download icon on the card itself
+
+- **A square download button sits in the card's top-right corner,** appearing
+  with the reveal. It is the veil's mirror image: covered shows the lock panel,
+  revealed shows the icon. Same `saveCard()` the main button calls, disabled
+  while busy so a double-tap cannot start two saves, and it shares the `uncover`
+  animation (and its reduced-motion opt-out) so it fades in with the card.
+- The main **Save your card** button stays; the icon is a second way to save,
+  not a replacement.
+- **Three tests broke and were fixed, not worked around.** The new button's
+  accessible name legitimately matched the existing `/Save your card/` regex, so
+  the two now have distinct exact names — "Save your card" and "Save your card
+  as an image" — and the selectors are exact rather than loosened. A new test
+  covers downloading from the corner icon. 46 passing, up from 45.
 
 ### 2026-09-23 — header wordmark only, and a mobile line break
 
