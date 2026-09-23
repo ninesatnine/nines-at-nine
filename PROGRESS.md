@@ -74,17 +74,16 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 
 ## Change log
 
-### 2026-09-23 (later still) — the card moves under the details on narrow screens
+### 2026-09-23 (later still) — the reveal scrolls into view on narrow screens
 
-- **Stacked layout puts the details first and the card below them.** Tied to
-  900px, where `.confirm-grid` already collapses to one column — reordering at
-  760px would have left 760–900px still showing the card on top. CSS `order`
-  only, so the DOM order is unchanged and the card still comes first for screen
-  readers and keyboard tabbing.
-- **The first submit brings the card into view, once.** A ref-guarded effect on
-  `count`, so pressing **Save your card** afterwards does not scroll again. It
+- **The first submit brings the card into view, once.** On the stacked layout
+  the card sits above the details, so by the time **Submit** is pressed the
+  reveal happens off screen, further up. A ref-guarded effect on `count` scrolls
+  to it, so pressing **Save your card** afterwards does not scroll again. It
   honours "reduce motion" by jumping rather than gliding, and only runs on the
   stacked layout — on the wide layout the card is already beside the form.
+- The card was briefly reordered below the details on narrow screens, then put
+  back where it was. Only the scroll remains.
 - **`vitest.setup.ts` needed a `matchMedia` stub.** jsdom does not implement it,
   so four tests crashed outright. Stubbed beside the `scrollIntoView` stub
   already there, defaulting to "nothing matches" — a wide window. 47 tests

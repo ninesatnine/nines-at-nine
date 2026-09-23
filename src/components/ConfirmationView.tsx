@@ -34,9 +34,9 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
     heading.current?.focus({ preventScroll: true });
   }, []);
 
-  // On the stacked layout the card sits below the details, so the reveal would
-  // otherwise happen off screen. Bring it into view once, on the first submit —
-  // not again when the card is saved.
+  // On the stacked layout the card sits above the details, so by the time the
+  // submit button is pressed the reveal happens off screen, further up. Bring
+  // the card into view once, on that first submit — not again when it is saved.
   useEffect(() => {
     if (count === null || broughtIntoView.current) return;
     broughtIntoView.current = true;

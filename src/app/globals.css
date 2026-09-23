@@ -179,9 +179,7 @@ section.block{padding-block:72px;text-align:center}
 .confirm-top{text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:36px}
 .confirm-top h1{font-size:clamp(40px,6vw,64px)}
 .confirm-grid{display:grid;grid-template-columns:minmax(0,460px) minmax(0,480px);justify-content:center;gap:72px;align-items:start}
-/* Stacked: the details come first, the card sits under them. */
-@media (max-width:900px){.confirm-grid{grid-template-columns:minmax(0,480px);gap:36px}
-  .confirm-grid .finish{order:1}.confirm-grid .ticket{order:2}}
+@media (max-width:900px){.confirm-grid{grid-template-columns:minmax(0,480px);gap:36px}}
 
 .ticket{padding:7px;border:1px solid var(--antique);border-radius:6px;position:relative}
 /* Opaque cover over the card until the entry is registered. */
