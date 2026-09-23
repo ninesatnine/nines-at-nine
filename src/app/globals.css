@@ -344,3 +344,87 @@ section.block{padding-block:72px;text-align:center}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;background:var(--ivory);color:var(--oxblood);padding:12px 20px;border-radius:999px;font-weight:600;font-size:15px;transition:.25s;pointer-events:none;z-index:80;white-space:nowrap}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 .proto-note{font-size:13px;color:var(--muted);text-align:center;opacity:.8}
+
+/* ---------- blog ----------
+   Editorial, not decorative. Poiret One stays on large display headings;
+   body copy is Josefin at a comfortable measure, because a display face set
+   at 17px over 70 characters is unreadable however handsome it is. */
+
+.blog-top{padding-block:64px 28px;text-align:center;display:flex;flex-direction:column;
+  align-items:center;gap:16px}
+.blog-top h1{font-size:clamp(40px,6vw,68px);line-height:1.05;text-wrap:balance}
+.blog-top .lede{max-width:56ch;color:var(--muted)}
+
+.post-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.post-list > li + li{border-top:1px solid rgba(87,27,35,.8)}
+.post-card{padding-block:34px;display:flex;flex-direction:column;gap:12px}
+.post-card h2{font-size:clamp(27px,3.4vw,38px);line-height:1.15;text-wrap:balance}
+.post-card h2 a{color:var(--ivory);text-decoration:none}
+.post-card h2 a:hover{color:var(--gold)}
+.post-excerpt{color:var(--muted);max-width:68ch;line-height:1.65}
+.post-more{color:var(--gold);text-decoration:none;font-size:15px;letter-spacing:.06em}
+.post-more:hover{text-decoration:underline}
+
+.post-meta{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:0;
+  font-size:13px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.post-topic{color:var(--gold-soft)}
+.post-draft,.post-draft-banner{color:var(--deep);background:var(--gold);border-radius:3px;
+  padding:2px 8px;letter-spacing:.08em}
+
+.blog-cta,.post-cta{text-align:center;display:flex;flex-direction:column;align-items:center;
+  gap:16px;padding-block:52px}
+.blog-cta h2,.post-cta h2{font-size:clamp(28px,4vw,44px)}
+.blog-cta p,.post-cta p{max-width:52ch}
+
+/* ---- article ---- */
+.post{padding-block:36px 8px;display:flex;flex-direction:column;gap:22px}
+.post-crumbs{font-size:13px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.post-crumbs a{color:var(--gold-soft);text-decoration:none}
+.post-crumbs a:hover{text-decoration:underline}
+.post-head{display:flex;flex-direction:column;gap:14px;max-width:24ch}
+.post-head h1{font-size:clamp(36px,5.4vw,62px);line-height:1.06;text-wrap:balance;max-width:none}
+.post-head{max-width:none}
+.post-standfirst{font-size:clamp(18px,2vw,21px);line-height:1.6;color:var(--gold-soft);
+  max-width:62ch}
+.post-draft-banner{align-self:flex-start;font-size:13px;text-transform:uppercase}
+
+/* The measure is the point: ~68 characters, sans-serif, generous leading. */
+.post-body{max-width:68ch;font-size:17px;line-height:1.75;color:var(--ivory)}
+.post-body > * + *{margin-top:1.15em}
+.post-body h2{font-family:var(--display);font-size:clamp(28px,3.6vw,38px);line-height:1.2;
+  color:var(--gold);margin-top:2em;text-wrap:balance}
+.post-body h3{font-size:21px;letter-spacing:.02em;color:var(--gold-soft);margin-top:1.8em}
+.post-body p{color:var(--ivory)}
+.post-body strong{color:var(--gold-soft);font-weight:400}
+.post-body em{font-style:italic;color:var(--muted)}
+.post-body a{color:var(--gold);text-underline-offset:3px}
+.post-body ul,.post-body ol{padding-left:1.25em;display:flex;flex-direction:column;gap:.55em}
+.post-body li{color:var(--ivory)}
+.post-body li::marker{color:var(--antique)}
+.post-body blockquote{border-left:2px solid var(--antique);padding-left:18px;color:var(--gold-soft)}
+.post-body hr{border:0;border-top:1px solid rgba(87,27,35,.8);margin-block:2em}
+
+/* Tables are the one thing allowed to be wider than the measure. */
+.post-body table{width:100%;border-collapse:collapse;font-size:15px;line-height:1.55}
+.post-body thead th{text-align:left;font-weight:400;letter-spacing:.09em;text-transform:uppercase;
+  font-size:12px;color:var(--gold);border-bottom:1px solid var(--antique);padding:10px 14px 10px 0}
+.post-body tbody td{vertical-align:top;padding:13px 14px 13px 0;color:var(--muted);
+  border-bottom:1px solid rgba(87,27,35,.55)}
+.post-body tbody td:first-child{color:var(--ivory)}
+
+.post-refs,.post-related{max-width:68ch;display:flex;flex-direction:column;gap:12px}
+.post-refs h2,.post-related h2{font-family:var(--display);font-size:26px;color:var(--gold)}
+.post-refs ol{padding-left:1.2em;display:flex;flex-direction:column;gap:9px;
+  font-size:15px;color:var(--muted)}
+.post-refs a{color:var(--gold-soft)}
+.post-related ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+.post-related a{font-family:var(--display);font-size:22px;color:var(--ivory);text-decoration:none}
+.post-related a:hover{color:var(--gold)}
+.post-related p{font-size:15px;margin-top:4px}
+
+@media (max-width:600px){
+  .post-body{font-size:16px}
+  .post-body table,.post-body thead th,.post-body tbody td{font-size:14px}
+  /* A table narrower than this becomes unreadable, so it scrolls on its own. */
+  .post-body table{display:block;overflow-x:auto;white-space:normal;min-width:100%}
+}

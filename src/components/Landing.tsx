@@ -27,7 +27,7 @@ const STEPS = [
   },
 ];
 
-export default function Home() {
+export function Landing() {
   const [joined, setJoined] = useState<Joined | null>(null);
 
   return (

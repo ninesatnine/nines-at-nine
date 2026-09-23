@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import { useToast } from "@/components/Toast";
+import { track } from "@/lib/analytics";
 import type { Joined } from "@/components/WaitlistForm";
 import { RegisterError, register } from "@/lib/register";
 
@@ -97,6 +98,9 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
         age: age!,
       });
       setCount(place);
+      // Counted only here, after the API confirmed the entry — never on the
+      // button press, which would overcount every rejected submit.
+      track("waitlist_success");
     } catch (err) {
       toast(err instanceof RegisterError ? err.message : "Something went wrong. Please try again.");
     } finally {

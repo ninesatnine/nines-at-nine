@@ -9,7 +9,7 @@ Add new entries to the top of the **Change log**.
 
 ## What exists today
 
-**Stack:** Next.js 16.3.5 (App Router, Turbopack), React 19, TypeScript.
+**Stack:** Next.js 16.3.5 (App Router, Turbopack), React 19, TypeScript. Blog content is Markdown in `content/blog/`, rendered at build time.
 **Run it:** `npm run dev -- -p 3107` → http://localhost:3107
 **Deploy it (Netlify Drop):** `npm run build:zip`, then drag `nines-at-nine-site.zip` onto https://app.netlify.com/drop.
 **Test it:** `npm test` (single run) or `npm run test:watch`. 45 tests. A JUnit XML report is written to `test-results/junit.xml`.
@@ -21,8 +21,10 @@ Add new entries to the top of the **Change log**.
 | `/terms` | Terms of Use — 26 clauses |
 | `/privacy` | Privacy Policy — 18 clauses, under the DPDP Act, 2023 |
 | `/house-rules` | House Rules — four short rules, four stages, and the consequences |
+| `/blog` | The journal index — six articles |
+| `/blog/[slug]` | An article, from `content/blog/<slug>.md` |
 
-All four prerender as static HTML.
+All of them prerender as static HTML, along with `sitemap.xml` and `robots.txt`.
 
 ### Landing page (`src/app/page.tsx`)
 1. **Hero:** "The Best-Looking Room in the City.", the logo mark, a join button, then the portrait reel
@@ -73,6 +75,159 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 ---
 
 ## Change log
+
+### 2026-09-23 (latest) — a real favicon
+
+The icon Chrome showed in the tab, and that Google shows beside a search
+result, was **still the Create Next App default** — the black circle with a
+white triangle, untouched since 18 September.
+
+- **`src/app/favicon.ico`** rebuilt from the supplied `logo.png`, at 16, 32,
+  48, 128 and 256px. The arch mark is cropped out of its 1080×1080 canvas
+  (where it occupied only 20% of the width) and set on solid oxblood `#290D10`,
+  matching the existing `theme-color`.
+- **The gold is extracted as alpha, not cropped.** A straight crop carried the
+  source's gradient background with it and left a visible lighter rectangle
+  behind the mark on the tile.
+- **16px is a simplified two-arch drawing, not a downscale.** The real mark has
+  three nested arches with hairline strokes; scaled to 16px they merge into a
+  blob. 32 and 48px use the real mark with the strokes dilated so they survive
+  the downsample; 128 and 256px are faithful.
+- **`src/app/apple-icon.png`** (180×180) added — there was none.
+- **`public/img/logo-square.png`** (512×512) added and referenced as `logo` in
+  the Organization JSON-LD. That is a different image from the favicon: it is
+  what a knowledge panel may use, and it is only emitted once
+  `NEXT_PUBLIC_SITE_URL` is set.
+- The old default is kept at `scratchpad/favicon-OLD-nextjs-default.ico` for
+  this session only.
+
+**Google re-crawls favicons on its own schedule,** so the search-result icon
+will lag the deploy by days to weeks, like the description snippet.
+
+### 2026-09-23 (latest) — legal pages reconciled with the source artifact
+
+Asked to bring Terms and Privacy back in line with the prototype artifact.
+
+**One real divergence found and removed.** Clause 11 of the Terms carried a
+sentence that is **not** in the artifact:
+
+> "The short version is on the [House Rules] page."
+
+It was added during the September rebuild, when House Rules became a real route
+rather than a `#hash` view in a single file. Helpful, but not the source text,
+so it is gone. `src/app/terms/page.tsx` is the only file changed.
+
+A first pass over these documents reported "no change needed". That was wrong:
+the sentence-level diff had been read only as far as its first screen, and the
+insertion sat further down. The word-level diff below is what found it.
+
+**Everything else was checked and matches.** Terms now shows **zero** genuine
+content differences against the artifact under a word-level diff. Privacy shows
+none either — its apparent differences are all matched insert/delete pairs of
+the same words, which is the table reconstruction putting collapsed cells back
+into the right columns.
+
+**Two presentational reconstructions are kept deliberately,** both fixing the
+same defect in the artifact's markup rather than changing its content:
+
+1. **The seven tables.** The artifact's own tables are collapsed — three columns
+   crammed into one cell, headers out of step with bodies. An order-insensitive
+   word-count over all seven confirms nothing was lost and nothing invented.
+2. **Clause 26, Contact.** The artifact renders it as a single run-on paragraph
+   with the Company and Address labels lost. The page restores them as a
+   labelled list. Only the two label words are not in the source; every other
+   word matches.
+
+**Confirmed identical:** 26 Terms clauses and 7 subheadings; 18 Privacy clauses
+and 10 subheadings; 77 and 57 list items; the dateline (Effective 21 September
+2026, Version 1.1, Last updated 20 September 2026); and the deployed pages,
+which match local except for the new footer Blog link.
+
+**The artifact settles how an Event happens:** "a scheduled online speed dating
+evening, comprising a series of short one-to-one video rounds", cameras on. So
+Terms and Privacy are right and **the homepage is the surface that is out of
+step** with its "Room in the City" and city-by-city framing. Marketing, not
+legal — left alone, and listed as an open item.
+
+The artifact uses `admin@ninesatnine.com` for every contact and its own footer
+carries `ninesatninehelp@gmail.com`. The site's `help@ninesatnine.com` and the
+removed footer address are later changes the owner asked for, not drift.
+
+### 2026-09-23 (latest) — homepage search metadata
+
+- **The homepage owns its metadata now.** `src/app/page.tsx` was a client
+  component, which cannot export `metadata`, so the homepage was silently
+  inheriting the root layout's. The landing page moved to
+  `src/components/Landing.tsx` and `src/app/page.tsx` is now a thin server
+  wrapper exporting title, description, Open Graph and Twitter tags. The copy
+  lives once in `src/lib/seo.ts`.
+- **Title** `Nines at Nine | Curated Speed Dating`. **Description:** "Nine
+  curated speed dates. Selected singles. Verified profiles. Nines at Nine
+  brings attraction first dating to a more exclusive format." — reused for
+  `og:description` and `twitter:description`. Verified in `out/index.html`:
+  exactly one `<title>`, exactly one `<meta name="description">`, and every
+  other route keeps its own.
+- **`NEXT_PUBLIC_SITE_URL=https://ninesatnine.com`**, so canonical tags and the
+  sitemap's 11 URLs are emitted.
+- A first draft of this metadata said *video* dating; the owner corrected it to
+  speed dating. No product copy, FAQ or article ever carried the video framing,
+  so nothing had to be undone there.
+
+**Open item — the site contradicts itself about how an Event happens.** This
+predates all of the above:
+
+- **Terms** define an Event as "a scheduled **online** speed dating evening,
+  comprising a series of short one-to-one **video** rounds", and warn about
+  your camera, microphone and connection.
+- **Privacy** lists a video infrastructure provider, live video in transit, and
+  a liveness capture used for verification.
+- **The homepage and FAQ** describe "The Best-Looking **Room** in the City",
+  "a room of people chosen to meet each other", and cities that have not been
+  announced.
+
+Both cannot be true. The new metadata is deliberately neutral on medium, and
+the speed-dating article's product sidebar no longer says "in person" — it
+states only what both sets of documents agree on. **Decide which is right and
+make one of the two consistent.**
+
+**Open item — the preferred URL and the host disagree.** The apex
+`https://ninesatnine.com/` is preferred and is what the canonical tag now says,
+but Vercel 308s the apex to `www`. Fix in Vercel's domain settings; static
+export means `next.config.ts` redirects do not apply.
+
+Google's "creative web development solutions" snippet is **stale** — no such
+copy exists in the repository or the live HTML.
+
+### 2026-09-23 (latest) — a blog, and the SEO groundwork under it
+
+Full notes in `docs/SEO.md`: audit, query-to-page map, claim/source log,
+measurement spec, 30/60/90 plan and the blockers needing owner access.
+
+- **`/blog` and `/blog/[slug]`,** from Markdown in `content/blog/`. Six
+  complete articles, ~7,600 words, fully server-rendered — no CMS, no database,
+  no service. Frontmatter carries title, description, excerpt, topic, author,
+  dates, status, references, related slugs and an optional image; reading time
+  is computed from the real text.
+- **Draft support.** `status: "draft"` shows in `npm run dev` with a banner and
+  is kept out of the production index, the sitemap and static generation, with
+  `noindex` on the route as a second line of defence.
+- **`sitemap.xml`, `robots.txt`, canonical URLs and JSON-LD** (Organization,
+  BlogPosting, BreadcrumbList) — none of which existed before.
+- **The production origin is configuration, and missing by default.**
+  `NEXT_PUBLIC_SITE_URL` drives every absolute URL; unset, `siteUrl()` returns
+  null and callers omit the tag rather than shipping `localhost` or an invented
+  domain, which would actively mislead crawlers. **So until it is set the
+  sitemap is empty and no canonicals are emitted** — verified both ways.
+- **Footer now has READ → Blog,** a real link.
+- **Three statistics, three sources, all opened and read** — two Pew surveys
+  with the population, sample size and fieldwork dates preserved in the prose.
+  Everything else is editorial reasoning or a labelled hypothetical. No
+  interviews, experts or endorsements are claimed, because there were none.
+  The byline is organisational.
+- **Analytics is a seam, not a vendor:** `blog_view`, `blog_waitlist_click` and
+  `waitlist_success` (fired only after the API confirms). No personal data can
+  travel; `window.__consent === false` blocks everything.
+- 63 tests passing, up from 48. Build clean; output inspected, not assumed.
 
 ### 2026-09-23 (latest) — the endpoint moves into the environment
 
@@ -200,7 +355,16 @@ The card's number is now real: it comes from `POST /register`.
 ---
 
 ## Open items / to do
-- [ ] **Read the legal pages end to end.** The prototype's broken tables were reconstructed by inference; confirm every row says what it should. Have a lawyer check the whole of both documents before launch.
+- [x] **The reconstructed tables are faithful.** Verified 23 September 2026
+  against the source artifact: all seven tables hold every word, nothing lost,
+  nothing invented. See the change log entry for that date.
+- [ ] **Have a lawyer check both documents before launch.** Fidelity to the
+  artifact is now established; whether the artifact itself says the right thing
+  is a separate question.
+- [ ] **The homepage contradicts the legal pages about how an Event happens.**
+  Terms and Privacy describe an online evening of one-to-one video rounds;
+  the homepage describes a room in a city. Decide which is right and make the
+  other match.
 - [ ] **Two contact addresses are in use.** The footer shows `help@ninesatnine.com`; every legal page says `admin@ninesatnine.com`. Both come from the prototype. Decide which is right.
 - [ ] **Two chips collapse to one value.** The API's gender enum is `male`/`female`/`other`, so "Non-binary" and "Prefer not to say" are indistinguishable once stored. Widen the enum if that difference matters.
 - [ ] **Add an OPTIONS route to the register API.** Without it the client must send `Content-Type: text/plain` to dodge the CORS preflight. Works, but it is a workaround.
@@ -213,4 +377,12 @@ The card's number is now real: it comes from `POST /register`.
 - [ ] **A flaky test.** `WaitlistForm > hands over the name, email and city` fails
   roughly one run in six, on committed code as well as new work — a timing flake
   in the test, not the form. Fix it before it erodes trust in the suite.
+- [ ] **Set `NEXT_PUBLIC_SITE_URL` in the deploy host.** Until it is set there
+  is no sitemap and no canonical tags — see `docs/SEO.md` §4 and §7.
+- [ ] **Verify the domain in Search Console and Bing Webmaster Tools,** and
+  submit the sitemap. Cannot be done from the repository.
+- [ ] **Choose an analytics vendor.** The events exist and fire; nothing
+  receives them yet.
+- [ ] **Read the six articles before launch** against the claim log in
+  `docs/SEO.md` §5.
 - [ ] **Version control.** All work since the initial Create Next App commit is uncommitted.

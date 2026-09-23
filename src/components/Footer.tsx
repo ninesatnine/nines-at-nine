@@ -17,6 +17,10 @@ export function Footer() {
               Nine dates. One Friday. Three minutes each.
             </p>
           </div>
+          <nav className="foot-col" aria-label="Read">
+            <h3>READ</h3>
+            <Link href="/blog">Blog</Link>
+          </nav>
           <nav className="foot-col" aria-label="Legal">
             <h3>LEGAL</h3>
             <Link href="/terms">Terms of Use</Link>

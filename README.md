@@ -127,6 +127,11 @@ To use a database directly instead, implement the `WaitlistStore` interface and 
 | `src/lib/register.ts` | The register API client, and the gender mapping |
 | `src/lib/cities.ts` | The 135 cities a room can open in, with their older names |
 | `src/lib/company.ts` | Company identity and document version, used by the footer and every legal page |
+| `content/blog/*.md` | The six articles — Markdown with YAML frontmatter |
+| `src/lib/blog.ts` | Reads and renders them at build time |
+| `src/lib/site.ts` | The production origin (`NEXT_PUBLIC_SITE_URL`), and absolute URLs |
+| `src/lib/analytics.ts` | The analytics event seam — no vendor wired up yet |
+| `docs/SEO.md` | SEO audit, query map, claim/source log, measurement, 30/60/90 |
 | `public/img/` | The logo and the sixteen reel portraits |
 
 ## Design tokens
