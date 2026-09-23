@@ -65,7 +65,7 @@ Joining swaps the landing page for a waitlist card, covered by an opaque panel r
 - **Page one sends nothing.** The register API needs gender and age too, so the three fields are held in the browser and handed to the card; the single POST happens when the card is saved.
 
 ### Legal content
-Company identity and document version live in one place (`src/lib/company.ts`): TechVortex Ventures Private Limited, CIN U62013WB2024PTC269470, GSTIN 19AAKCT8808L1ZJ, Grievance Officer Nilabja Datta, admin@ninesatnine.com. Documents are version 1.1, effective 21 September 2026.
+Company identity and document version live in one place (`src/lib/company.ts`): TechVortex Ventures Private Limited, CIN U62013WB2024PTC269470, GSTIN 19AAKCT8808L1ZJ, Grievance Officer Nilabja Datta, admin@ninesatnine.com. The registered address is used by the legal pages only; the footer shows the copyright line alone. Documents are version 1.1, effective 21 September 2026.
 
 ### Assets
 `public/img/logo.png` and `public/img/m01.jpg`–`m16.jpg` (the reel portraits).
@@ -73,6 +73,18 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 ---
 
 ## Change log
+
+### 2026-09-23 (latest) — the address is off the footer
+
+- **The footer no longer carries the street address.** It shows the copyright
+  line alone. The now-unused `addressShort` field is gone from `company.ts` too,
+  rather than left lying around.
+- **The full address stays on the legal pages,** deliberately: `COMPANY.address`
+  appears five times across `/terms` and `/privacy` as the registered office in
+  the entity clause and in the contact tables. Removing it there is a
+  substantive legal change — an Indian company's registered office is expected
+  in terms and in a DPDP privacy policy, and the Grievance Officer's contact
+  block is a statutory requirement. Decide that one deliberately.
 
 ### 2026-09-23 (later still) — the reveal scrolls into view on narrow screens
 
@@ -170,7 +182,7 @@ The card's number is now real: it comes from `POST /register`.
 
 ## Open items / to do
 - [ ] **Read the legal pages end to end.** The prototype's broken tables were reconstructed by inference; confirm every row says what it should. Have a lawyer check the whole of both documents before launch.
-- [ ] **Two contact addresses are in use.** The footer shows `ninesatninehelp@gmail.com`; every legal page says `admin@ninesatnine.com`. Both come from the prototype. Decide which is right.
+- [ ] **Two contact addresses are in use.** The footer shows `ninesatnineofficial@gmail.com`; every legal page says `admin@ninesatnine.com`. Both come from the prototype. Decide which is right.
 - [ ] **Two chips collapse to one value.** The API's gender enum is `male`/`female`/`other`, so "Non-binary" and "Prefer not to say" are indistinguishable once stored. Widen the enum if that difference matters.
 - [ ] **Add an OPTIONS route to the register API.** Without it the client must send `Content-Type: text/plain` to dodge the CORS preflight. Works, but it is a workaround.
 - [ ] **The endpoint is called from the browser,** so it is public and unauthenticated. Consider rate limiting or a token before launch.

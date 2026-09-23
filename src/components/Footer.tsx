@@ -30,7 +30,6 @@ export function Footer() {
         </div>
         <div className="foot-base">
           <span>© 2026 {COMPANY.name}. All rights reserved.</span>
-          <span>{COMPANY.addressShort}</span>
         </div>
       </div>
     </footer>

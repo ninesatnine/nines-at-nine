@@ -171,7 +171,7 @@ export function WaitlistForm({ onJoined }: { onJoined: (joined: Joined) => void 
       <button className="btn block" id="formCta" type="submit">
         Join the waitlist
       </button>
-      <p className="fine">Waitlist only. An invitation is not guaranteed.</p>
+      
     </form>
   );
 }
