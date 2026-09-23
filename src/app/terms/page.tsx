@@ -315,8 +315,8 @@ export default function TermsPage() {
           </Clause>
           <p>
             Four rules carry the evening: be the person in your photographs, turn up, cameras on, and
-            treat everyone as you would in a room you were invited into. The short version is on the{" "}
-            <Link href="/house-rules">House Rules</Link> page. Below is what that means in full.
+            treat everyone as you would in a room you were invited into. Below is what that means in
+            full.
           </p>
           <p>You must not, on the Service or at an Event:</p>
           <List
