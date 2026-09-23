@@ -46,7 +46,7 @@ export default function Home() {
                 Room in the City.
               </h1>
               <DiamondRule />
-              <p className="lede">Nine dates. One Friday. Three minutes each.</p>
+              <p className="lede">Nine dates. One Friday. <span className="wrap-mobile">Three minutes each.</span></p>
               <a className="btn" id="heroCta" href="#waitlist">
                 Join the waitlist
               </a>
@@ -61,8 +61,9 @@ export default function Home() {
               <section className="block" id="experience" aria-labelledby="expH">
                 <div className="block-head">
                   <span className="eyebrow">The experience</span>
-                  <h2 id="expH">Hot or Not? We’ll Decide.</h2>
-                  <p>Eighteen People. All Verified. No Swiping Required.</p>
+                  <h2 id="expH">Hot or Not? <span className="wrap-mobile">Jury Will Decide.</span></h2>
+                  <p></p>
+                  <p>Eighteen People. All Verified. <span className="wrap-mobile">No Swiping Required.</span></p>
                 </div>
                 <div className="trio">
                   {FACTS.map((fact) => (

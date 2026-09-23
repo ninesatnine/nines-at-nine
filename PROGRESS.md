@@ -3,7 +3,7 @@
 A running record of what has been built, what changed, and what is still open.
 Add new entries to the top of the **Change log**.
 
-**Current focus:** design and front end only. No real backend or API is connected yet.
+**Current focus:** front end and design. The waitlist register API is connected (since 2026-09-22); there is no other backend.
 
 ---
 
@@ -73,6 +73,20 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 ---
 
 ## Change log
+
+### 2026-09-23 — header wordmark only, and a mobile line break
+
+- **The logo is gone from the header,** at every width; it is now the wordmark
+  NINES AT NINE alone. `next/image` and the `with-mark` class went with it.
+  The hero's large logo mark and the footer's are untouched — note the footer
+  still uses `.head-mark` and `.wordmark.with-mark`, so those rules stay in
+  `globals.css` despite no longer styling anything in the header.
+- **"No Swiping Required." drops to its own line below 760px.** The tail of the
+  experience tagline is wrapped in `.wrap-mobile`, which goes `display:block`
+  at that width. A span rather than a `<br>`, so the break is purely visual and
+  the sentence stays continuous for screen readers and text selection. Above
+  760px it reads as one line exactly as before.
+- 45 tests passing; typecheck and lint clean.
 
 ### 2026-09-22
 - **Rebuilt the site to match the new design, and added the three legal pages.** Source: the shared artifact at https://claude.ai/artifact/1CJ2BJpNunMVZL7ZKf9hEC (a single-file HTML prototype). Its logo and sixteen portraits were pulled into `public/img/`.

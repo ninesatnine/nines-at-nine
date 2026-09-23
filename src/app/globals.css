@@ -111,6 +111,7 @@ section.block{padding-block:72px;text-align:center}
 .step-mark text{font-family:var(--display);font-size:13px;fill:currentColor}
 .step h3{font-size:30px}
 .step p{color:var(--muted);max-width:320px}
+@media (max-width:760px){.wrap-mobile{display:block}}
 @media (max-width:760px){
   .trio,.steps{grid-template-columns:1fr}
   .trio{text-align:left}

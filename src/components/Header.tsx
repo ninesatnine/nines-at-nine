@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -45,8 +44,7 @@ export function Header({ hideNav = false }: { hideNav?: boolean }) {
   return (
     <header className={`site-head${scrolled ? " scrolled" : ""}`}>
       <div className="wrap head-row">
-        <Link className="wordmark with-mark" href="/" aria-label="Nines at Nine, home">
-          <Image className="head-mark" src="/img/logo.png" alt="" width={186} height={240} priority />
+        <Link className="wordmark" href="/" aria-label="Nines at Nine, home">
           <span>NINES AT NINE</span>
         </Link>
         <nav className="nav" aria-label="Main" style={hidden}>
