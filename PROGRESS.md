@@ -74,6 +74,25 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 
 ## Change log
 
+### 2026-09-23 (latest) — the endpoint moves into the environment
+
+- **`NEXT_PUBLIC_REGISTER_URL` is now the only source of the endpoint.** The
+  hardcoded AWS URL is gone from `src/lib/register.ts`; the value lives in
+  `.env.local` (gitignored) and, for a deploy, in the host's build settings.
+  `.env.example` documents it.
+- **An unset variable fails the build, not the visitor.** Next evaluates the
+  module while prerendering, so a missing endpoint stops the build with a
+  named error rather than shipping a site whose form quietly posts nowhere.
+  Verified both ways: a normal build succeeds and inlines the URL; moving
+  `.env.local` aside fails with "NEXT_PUBLIC_REGISTER_URL is not set".
+- **It is still public.** `NEXT_PUBLIC_*` is inlined into the client bundle —
+  I confirmed the URL appears in `out/_next/static/chunks/`. This hides nothing
+  from anyone; it is a location, not a secret. **No key or token may ever go in
+  a `NEXT_PUBLIC_*` variable,** and being a static export there is no server to
+  keep one on.
+- Tests supply their own endpoint through `vitest.config.mts` rather than
+  reading `.env.local` or touching the real API. 48 passing, up from 47.
+
 ### 2026-09-23 (latest) — the address is off the footer
 
 - **The footer no longer carries the street address.** It shows the copyright

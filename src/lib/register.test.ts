@@ -43,6 +43,11 @@ describe("toPayload", () => {
 });
 
 describe("register", () => {
+  it("reads its endpoint from the environment", () => {
+    // Supplied by vitest.config.mts, not hardcoded in the client.
+    expect(REGISTER_URL).toBe("https://register.test/register");
+  });
+
   it("posts the entry and returns the place in line", async () => {
     const fetchMock = mockFetch({ status: "created", count: 255 }, 201);
     const result = await register(entry);

@@ -45,7 +45,7 @@ After joining, the card sits behind an opaque cover reading *"Complete the rest 
 Submit is inert until gender and age are filled in; pressing it early nudges the empty fields instead. If the API rejects the entry, its message is shown in a toast, the card stays covered, and nothing is downloaded.
 
 ```http
-POST https://qab324zxc9.execute-api.ap-south-1.amazonaws.com/register
+POST $NEXT_PUBLIC_REGISTER_URL
 Content-Type: application/json
 
 { "name": "Aanya", "email": "aanya@example.com", "gender": "female", "age": "27", "city": "Bengaluru" }
@@ -60,7 +60,9 @@ Content-Type: application/json
 
 Both 201 and 200 count as success. `gender` must be `male`, `female` or `other`, so the four chips map onto three values — **"Non-binary" and "Prefer not to say" both send `other`**.
 
-Override the endpoint with `NEXT_PUBLIC_REGISTER_URL` (read at build time, since the site is a static export).
+**The endpoint lives in the environment, not in the source.** Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_REGISTER_URL`; for a deploy, set it in the host's build settings. Without it the build fails, rather than shipping a site whose form silently does nothing.
+
+`NEXT_PUBLIC_*` is read at build time and inlined into the client bundle, so the URL ships to the browser in plain sight. That is fine for a location — it is a public endpoint the page has to call — but it means **no key or token may ever go in a `NEXT_PUBLIC_*` variable**. The site is a static export, so there is no server to keep one on.
 
 ### Why the request says `Content-Type: text/plain`
 

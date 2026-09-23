@@ -9,9 +9,21 @@
  * is the place in line we print on the card.
  */
 
-export const REGISTER_URL =
-  process.env.NEXT_PUBLIC_REGISTER_URL ??
-  "https://qab324zxc9.execute-api.ap-south-1.amazonaws.com/register";
+/* The endpoint lives in the environment, not here. NEXT_PUBLIC_* is read at
+ * build time and inlined into the client bundle, so it ships to the browser in
+ * plain sight — a location, not a secret. Set it in .env.local for development
+ * and in the host's build settings for a deploy; see .env.example. */
+export const REGISTER_URL = process.env.NEXT_PUBLIC_REGISTER_URL ?? "";
+
+// Fail the build, not the visitor. Next evaluates this module while
+// prerendering, so an unset variable stops the build here rather than shipping
+// a site whose form quietly posts nowhere.
+if (!REGISTER_URL) {
+  throw new Error(
+    "NEXT_PUBLIC_REGISTER_URL is not set. Copy .env.example to .env.local and fill it in, " +
+      "or set it in the host's build settings.",
+  );
+}
 
 /** The only values the API accepts. */
 export type ApiGender = "male" | "female" | "other";
