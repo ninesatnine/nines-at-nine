@@ -74,6 +74,22 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 
 ## Change log
 
+### 2026-09-23 (later still) — the card moves under the details on narrow screens
+
+- **Stacked layout puts the details first and the card below them.** Tied to
+  900px, where `.confirm-grid` already collapses to one column — reordering at
+  760px would have left 760–900px still showing the card on top. CSS `order`
+  only, so the DOM order is unchanged and the card still comes first for screen
+  readers and keyboard tabbing.
+- **The first submit brings the card into view, once.** A ref-guarded effect on
+  `count`, so pressing **Save your card** afterwards does not scroll again. It
+  honours "reduce motion" by jumping rather than gliding, and only runs on the
+  stacked layout — on the wide layout the card is already beside the form.
+- **`vitest.setup.ts` needed a `matchMedia` stub.** jsdom does not implement it,
+  so four tests crashed outright. Stubbed beside the `scrollIntoView` stub
+  already there, defaulting to "nothing matches" — a wide window. 47 tests
+  passing, up from 46.
+
 ### 2026-09-23 (later) — a download icon on the card itself
 
 - **A square download button sits in the card's top-right corner,** appearing
@@ -164,4 +180,7 @@ The card's number is now real: it comes from `POST /register`.
 - [ ] **Cookies.** The Privacy Policy describes a cookie banner and refusable analytics and preference cookies. The site sets no cookies and has no banner. Build the banner, or narrow that clause.
 - [ ] **Photos.** Confirm a licence for each of the sixteen portraits.
 - [ ] **City list.** 135 cities, down from 470 names. Since city is now required and must match the list, add any city you expect applicants from.
+- [ ] **A flaky test.** `WaitlistForm > hands over the name, email and city` fails
+  roughly one run in six, on committed code as well as new work — a timing flake
+  in the test, not the form. Fix it before it erodes trust in the suite.
 - [ ] **Version control.** All work since the initial Create Next App commit is uncommitted.

@@ -148,6 +148,30 @@ describe("ConfirmationView", () => {
     expect(clicks[0].download).toBe("nines-at-nine-card-255.png");
   });
 
+  it("brings the card into view once when it is revealed, not again on save", async () => {
+    const user = userEvent.setup();
+    mockFetch({ status: "created", count: 255 }, 201);
+    // The stacked layout, where the card sits below the details.
+    vi.stubGlobal("matchMedia", (media: string) => ({
+      media,
+      matches: media.includes("max-width"),
+      addEventListener() {},
+      removeEventListener() {},
+    }));
+    const intoView = vi.spyOn(Element.prototype, "scrollIntoView");
+    render(<ConfirmationView joined={joined} onBack={() => {}} />);
+    await complete(user);
+
+    await user.click(submit());
+    await waitFor(() => expect(screen.getByText("Nº 255")).toBeTruthy());
+    expect(intoView).toHaveBeenCalledOnce();
+
+    // Saving the card does not scroll again.
+    await user.click(saveBtn());
+    await waitFor(() => expect(clicks).toHaveLength(1));
+    expect(intoView).toHaveBeenCalledOnce();
+  });
+
   it("accepts 200 for an entry that already existed", async () => {
     const user = userEvent.setup();
     mockFetch({ status: "updated", count: 42 }, 200);

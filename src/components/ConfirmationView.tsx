@@ -25,12 +25,25 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
   const heading = useRef<HTMLHeadingElement>(null);
   const firstChip = useRef<HTMLButtonElement>(null);
   const ageInput = useRef<HTMLInputElement>(null);
+  const ticket = useRef<HTMLDivElement>(null);
+  const broughtIntoView = useRef(false);
   const { toast, node: toastNode } = useToast();
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     heading.current?.focus({ preventScroll: true });
   }, []);
+
+  // On the stacked layout the card sits below the details, so the reveal would
+  // otherwise happen off screen. Bring it into view once, on the first submit —
+  // not again when the card is saved.
+  useEffect(() => {
+    if (count === null || broughtIntoView.current) return;
+    broughtIntoView.current = true;
+    if (!window.matchMedia("(max-width: 900px)").matches) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    ticket.current?.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "center" });
+  }, [count]);
 
   const missing = (gender ? 0 : 1) + (age ? 0 : 1);
   const complete = missing === 0;
@@ -124,7 +137,11 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
       </div>
 
       <div className="confirm-grid">
-        <div className={`ticket${revealed ? " revealed" : ""}`} aria-label="Your waitlist card">
+        <div
+          ref={ticket}
+          className={`ticket${revealed ? " revealed" : ""}`}
+          aria-label="Your waitlist card"
+        >
           {revealed ? (
             <button
               type="button"
