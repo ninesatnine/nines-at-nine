@@ -35,15 +35,14 @@ Every field is required: first name, email, a city from the list, and the 18+/up
 
 ## The confirmation card, and the register API
 
-After joining, the page shows a ticket with the name and city. The place in line is blank until the entry is registered.
+After joining, the card sits behind an opaque cover reading *"Complete the rest of the details to reveal your card."* It takes two presses of one button to get past it:
 
-Adding gender and age unlocks **Save your card**, which:
+| Press | Button reads | What happens |
+| --- | --- | --- |
+| 1 | **Submit** | `POST`s the whole entry to the register API (`src/lib/register.ts`). On success, `count` from the response becomes the place in line, the cover lifts, and the button becomes the save. |
+| 2 | **Save your card** | Draws the revealed ticket to a canvas at 1080×1440 and downloads it as a PNG named after the number. |
 
-1. `POST`s the whole entry to the register API (`src/lib/register.ts`),
-2. takes `count` from the response as the place in line,
-3. draws the ticket to a canvas at 1080×1440 and downloads it as a PNG.
-
-If the API rejects the entry, its own message is shown in a toast and nothing is downloaded.
+Submit is inert until gender and age are filled in; pressing it early nudges the empty fields instead. If the API rejects the entry, its message is shown in a toast, the card stays covered, and nothing is downloaded.
 
 ```http
 POST https://qab324zxc9.execute-api.ap-south-1.amazonaws.com/register
@@ -140,4 +139,4 @@ The reel uses `public/img/m01.jpg`–`m16.jpg`, listed in `PHOTOS` in `src/compo
 
 ## Tests
 
-`npm test` runs Vitest + React Testing Library (44 tests) and writes a JUnit report to `test-results/junit.xml`. Coverage: validation rules, the city list and its alias matching, the combobox's keyboard and mouse behaviour, the form's required-field and honeypot handling, the register client (payload mapping, 201/200, error passthrough, network failure), and the save flow end to end (nothing sent on page one, posts on save, number taken from the response, download named after it, no download when rejected).
+`npm test` runs Vitest + React Testing Library (45 tests) and writes a JUnit report to `test-results/junit.xml`. Coverage: validation rules, the city list and its alias matching, the combobox's keyboard and mouse behaviour, the form's required-field and honeypot handling, the register client (payload mapping, 201/200, error passthrough, network failure), and the reveal flow end to end (card covered at first, nothing sent on page one, Submit posts once, number taken from the response, cover lifts and the button turns into the save, second press downloads a file named after the number, and a rejected submit leaves the card covered with nothing downloaded).

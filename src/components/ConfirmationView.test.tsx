@@ -71,13 +71,19 @@ async function complete(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe("ConfirmationView", () => {
-  it("shows no number until the entry is registered", () => {
+  const submit = () => screen.getByRole("button", { name: /Submit/ });
+  const saveBtn = () => screen.getByRole("button", { name: /Save your card/ });
+
+  it("covers the card until the entry is registered", () => {
     render(<ConfirmationView joined={joined} onBack={() => {}} />);
-    expect(screen.getByText(/^Nº/).textContent).not.toMatch(/\d/);
-    expect(screen.getByText(/Add your gender and age to complete your card/)).toBeTruthy();
+    expect(
+      screen.getByText("Complete the rest of the details to reveal your card."),
+    ).toBeTruthy();
+    expect(submit()).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Save your card/ })).toBeNull();
   });
 
-  it("registers on save, then downloads the card with the number from the response", async () => {
+  it("reveals the card on a successful submit, and only then offers the save", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch({ status: "created", count: 255 }, 201);
     render(<ConfirmationView joined={joined} onBack={() => {}} />);
@@ -86,7 +92,7 @@ describe("ConfirmationView", () => {
     // Nothing sent while filling in the card.
     expect(fetchMock).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole("button", { name: /Save your card/ }));
+    await user.click(submit());
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce());
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({
@@ -97,11 +103,32 @@ describe("ConfirmationView", () => {
       city: "Pune",
     });
 
-    // The number comes from the API, and the download is named after it.
+    // Uncovered, numbered, and the button has become the save.
+    await waitFor(() =>
+      expect(
+        screen.queryByText("Complete the rest of the details to reveal your card."),
+      ).toBeNull(),
+    );
+    expect(screen.getByText("Nº 255")).toBeTruthy();
+    expect(screen.getByText("CARD COMPLETE")).toBeTruthy();
+    expect(saveBtn()).toBeTruthy();
+
+    // Submitting did not download anything on its own.
+    expect(clicks).toHaveLength(0);
+  });
+
+  it("downloads the card, named after the number, on the second press", async () => {
+    const user = userEvent.setup();
+    mockFetch({ status: "created", count: 255 }, 201);
+    render(<ConfirmationView joined={joined} onBack={() => {}} />);
+    await complete(user);
+    await user.click(submit());
     await waitFor(() => expect(screen.getByText("Nº 255")).toBeTruthy());
+
+    await user.click(saveBtn());
+
     await waitFor(() => expect(clicks).toHaveLength(1));
     expect(clicks[0].download).toBe("nines-at-nine-card-255.png");
-    expect(screen.getByText("CARD COMPLETE")).toBeTruthy();
   });
 
   it("accepts 200 for an entry that already existed", async () => {
@@ -109,33 +136,36 @@ describe("ConfirmationView", () => {
     mockFetch({ status: "updated", count: 42 }, 200);
     render(<ConfirmationView joined={joined} onBack={() => {}} />);
     await complete(user);
-    await user.click(screen.getByRole("button", { name: /Save your card/ }));
+    await user.click(submit());
 
     await waitFor(() => expect(screen.getByText("Nº 42")).toBeTruthy());
-    await waitFor(() => expect(clicks).toHaveLength(1));
+    expect(saveBtn()).toBeTruthy();
   });
 
-  it("does not download when registration is rejected, and says why", async () => {
+  it("keeps the card covered when registration is rejected, and says why", async () => {
     const user = userEvent.setup();
     mockFetch({ error: "gender must be one of: male, female, other" }, 400);
     render(<ConfirmationView joined={joined} onBack={() => {}} />);
     await complete(user);
-    await user.click(screen.getByRole("button", { name: /Save your card/ }));
+    await user.click(submit());
 
     await waitFor(() =>
       expect(screen.getByRole("status").textContent).toBe(
         "gender must be one of: male, female, other",
       ),
     );
+    expect(
+      screen.getByText("Complete the rest of the details to reveal your card."),
+    ).toBeTruthy();
     expect(clicks).toHaveLength(0);
     expect(screen.queryByText(/Nº \d/)).toBeNull();
   });
 
-  it("will not save, or send anything, until gender and age are given", async () => {
+  it("will not submit, or send anything, until gender and age are given", async () => {
     const user = userEvent.setup();
     const fetchMock = mockFetch({ status: "created", count: 1 }, 201);
     render(<ConfirmationView joined={joined} onBack={() => {}} />);
-    await user.click(screen.getByRole("button", { name: /Save your card/ }));
+    await user.click(submit());
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(clicks).toHaveLength(0);

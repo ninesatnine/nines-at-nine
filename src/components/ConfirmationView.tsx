@@ -19,7 +19,7 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
   const [ageText, setAgeText] = useState("");
   const [ageError, setAgeError] = useState("");
   const [nudge, setNudge] = useState({ gender: false, age: false });
-  const [saving, setSaving] = useState(false);
+  const [busy, setBusy] = useState(false);
   // The place in line comes back from the API when the entry is registered.
   const [count, setCount] = useState<number | null>(null);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -56,20 +56,26 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
     }
   }
 
-  async function save() {
-    if (!complete) {
-      setNudge({ gender: false, age: false });
-      requestAnimationFrame(() => setNudge({ gender: !gender, age: !age }));
-      if (!gender) firstChip.current?.focus();
-      else ageInput.current?.focus();
-      toast("Add your gender and age first");
-      return;
-    }
-    if (saving) return;
-    setSaving(true);
+  /** The card stays covered until the entry is registered. */
+  const revealed = count !== null;
+
+  /** Nudge the empty fields and say what is missing. */
+  function askForTheRest() {
+    setNudge({ gender: false, age: false });
+    requestAnimationFrame(() => setNudge({ gender: !gender, age: !age }));
+    if (!gender) firstChip.current?.focus();
+    else ageInput.current?.focus();
+    toast("Add your gender and age first");
+  }
+
+  /** First press: register the entry, and uncover the card with the number it returns. */
+  async function submitDetails() {
+    if (!complete) return askForTheRest();
+    if (busy) return;
+    setBusy(true);
     try {
-      // Register first: the number printed on the card comes from the response.
-      // Repeat saves are safe — the API is idempotent on email and returns the same count.
+      // Repeat submissions are safe — the API is idempotent on email and
+      // returns the same count.
       const { count: place } = await register({
         name: joined.name,
         email: joined.email,
@@ -78,23 +84,33 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
         age: age!,
       });
       setCount(place);
+    } catch (err) {
+      toast(err instanceof RegisterError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
 
-      const blob = await drawCard({ ...joined, gender, age, count: place });
+  /** Second press: draw the revealed card and hand it over as a PNG. */
+  async function saveCard() {
+    if (count === null || busy) return;
+    setBusy(true);
+    try {
+      const blob = await drawCard({ ...joined, gender, age, count });
       if (!blob) throw new Error("no blob");
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `nines-at-nine-card-${place}.png`;
+      a.download = `nines-at-nine-card-${count}.png`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 4000);
       toast("Card saved");
-    } catch (err) {
-      // A registration failure has its own message; anything later is the download.
-      toast(err instanceof RegisterError ? err.message : "Saving isn’t available here");
+    } catch {
+      toast("Saving isn’t available here");
     } finally {
-      setSaving(false);
+      setBusy(false);
     }
   }
 
@@ -108,8 +124,24 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
       </div>
 
       <div className="confirm-grid">
-        <div className="ticket" aria-label="Your waitlist card">
-          <div className="ticket-in">
+        <div className={`ticket${revealed ? " revealed" : ""}`} aria-label="Your waitlist card">
+          {revealed ? null : (
+            <div className="ticket-veil">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                aria-hidden="true"
+              >
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+              </svg>
+              <p>Complete the rest of the details to reveal your card.</p>
+            </div>
+          )}
+          {/* Hidden from screen readers while covered, so the veil's message stands alone. */}
+          <div className="ticket-in" aria-hidden={!revealed || undefined}>
             <span className="t-brand">NINES AT NINE · WAITLIST</span>
             <Image className="mark" src="/img/logo.png" alt="" width={186} height={240} />
             <span className="t-label">YOUR PLACE IN LINE</span>
@@ -147,7 +179,7 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
                   CARD COMPLETE
                 </span>
               ) : complete ? (
-                "Save your card to claim your place in line"
+                "Submit to reveal your card"
               ) : (
                 `Add ${missingLabel} to complete your card`
               )}
@@ -158,10 +190,10 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
         <div className="finish">
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <h2>
-              {count !== null
-                ? "You’re number " + count.toLocaleString("en-IN") + "."
+              {revealed
+                ? "You’re number " + count!.toLocaleString("en-IN") + "."
                 : complete
-                  ? "Your card is ready."
+                  ? "Ready when you are."
                   : missing === 2
                     ? "Two details to unlock your card."
                     : "One more detail."}
@@ -228,7 +260,7 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
               className="btn block"
               aria-disabled={!complete}
               aria-describedby="saveHint"
-              onClick={save}
+              onClick={revealed ? saveCard : submitDetails}
             >
               <svg
                 width="18"
@@ -239,7 +271,7 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
                 strokeWidth="1.8"
                 aria-hidden="true"
               >
-                {complete ? (
+                {revealed ? (
                   <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
                 ) : (
                   <>
@@ -248,14 +280,24 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
                   </>
                 )}
               </svg>
-              <span>{saving ? "Saving…" : "Save your card"}</span>
+              <span>
+                {busy
+                  ? revealed
+                    ? "Saving…"
+                    : "Submitting…"
+                  : revealed
+                    ? "Save your card"
+                    : "Submit"}
+              </span>
             </button>
             <p className="save-hint" id="saveHint">
               {!complete
                 ? `Add ${missingLabel} to unlock your card.`
-                : saving
+                : busy && !revealed
                   ? "Sending your details…"
-                  : "Saves as an image to your device."}
+                  : revealed
+                    ? "Saves as an image to your device."
+                    : "Submit to reveal your card."}
             </p>
             <button type="button" className="back" onClick={onBack}>
               Back to home

@@ -12,7 +12,7 @@ Add new entries to the top of the **Change log**.
 **Stack:** Next.js 16.3.5 (App Router, Turbopack), React 19, TypeScript.
 **Run it:** `npm run dev -- -p 3107` → http://localhost:3107
 **Deploy it (Netlify Drop):** `npm run build:zip`, then drag `nines-at-nine-site.zip` onto https://app.netlify.com/drop.
-**Test it:** `npm test` (single run) or `npm run test:watch`. 44 tests. A JUnit XML report is written to `test-results/junit.xml`.
+**Test it:** `npm test` (single run) or `npm run test:watch`. 45 tests. A JUnit XML report is written to `test-results/junit.xml`.
 
 ### Pages
 | Route | What it is |
@@ -33,7 +33,7 @@ All four prerender as static HTML.
 6. **Footer:** wordmark, legal links, contact, company line
 
 ### Confirmation view (`src/components/ConfirmationView.tsx`)
-Joining swaps the landing page for a waitlist card: name, city and a place in line on a ticket with punched notches. The number is blank until the entry is registered. The header nav is blanked here. Picking a gender chip and typing an age fills the two blank rows, and unlocks **Save your card** — which registers the entry (`src/lib/register.ts`), stamps CARD COMPLETE with the number the API returns, draws the ticket to a 1080×1440 canvas and downloads it as a PNG. A toast confirms the save, or carries the API's error if it was rejected.
+Joining swaps the landing page for a waitlist card, covered by an opaque panel reading "Complete the rest of the details to reveal your card." The header nav is blanked here. Picking a gender chip and typing an age arms **Submit**, which registers the entry (`src/lib/register.ts`) and, on success, lifts the cover to show the ticket — name, city, gender, age and the place in line the API returned, stamped CARD COMPLETE. The button then becomes **Save your card**, which draws the ticket to a 1080×1440 canvas and downloads it as a PNG. A toast confirms the save, or carries the API's error if the submit was rejected.
 
 ### Design system (`src/app/globals.css`)
 - Colours: oxblood `#290D10`, deep `#1D080B`, burgundy `#571B23`, glow `#74372F`, gold `#F4C469`, gold-soft, antique, ivory, muted, error.
@@ -87,6 +87,17 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
   - **Aurora fix.** The aurora CSS was a byte-for-byte copy of the artifact's, but rendered almost flat: a leftover `background` on `html` from the old stylesheet stopped `body`'s background propagating to the canvas, so `body` painted an opaque box over the `z-index:-1` aurora layer. `body` is transparent again, with `html` keeping the solid oxblood fallback.
   - Tests rewritten for the new rules: 31 passing, covering validation, the city list and alias matching, the combobox, and the form. Lint, typecheck and the static build are all clean.
 
+### 2026-09-22 (later still) — the card is covered until you submit
+
+The card now has to be earned. Two presses of one button instead of one.
+
+- **The card starts covered.** An opaque panel over the ticket reads "Complete the rest of the details to reveal your card.", with a lock. The ticket underneath is `aria-hidden` while covered, so screen readers get the cover's message and not a half-filled card.
+- **Press one, "Submit",** registers the entry. On success the cover lifts (a short fade-and-scale, skipped under "reduce motion"), the real number lands on the ticket, and the CARD COMPLETE seal appears.
+- **Press two, now "Save your card",** draws and downloads the PNG. Registration and download are no longer the same click.
+- A rejected submit keeps the card covered and downloads nothing; the API's message goes to the toast.
+- Copy follows the state: the heading runs "Two details to unlock your card." → "One more detail." → "Ready when you are." → "You're number N."; the hint runs "Add … to unlock your card." → "Submit to reveal your card." → "Saves as an image to your device."
+- Verified in Chrome on the Mac: covered → Submit → `201` → revealed at `Nº 258` → Save → `nines-at-nine-card-258.png` (1080×1440). 45 tests passing.
+
 ### 2026-09-22 (later) — waitlist register API connected
 
 The card's number is now real: it comes from `POST /register`.
@@ -119,7 +130,7 @@ The card's number is now real: it comes from `POST /register`.
 - [ ] **Two chips collapse to one value.** The API's gender enum is `male`/`female`/`other`, so "Non-binary" and "Prefer not to say" are indistinguishable once stored. Widen the enum if that difference matters.
 - [ ] **Add an OPTIONS route to the register API.** Without it the client must send `Content-Type: text/plain` to dodge the CORS preflight. Works, but it is a workaround.
 - [ ] **The endpoint is called from the browser,** so it is public and unauthenticated. Consider rate limiting or a token before launch.
-- [ ] **Test entries are in the register database** from wiring this up: `claude-integration-test-0001@example.com`, `claude-integration-test-0002@example.com` (rejected, 400), `cors-probe-0001@example.com`, `aanya.mactest@example.com`. Delete them before launch.
+- [ ] **Test entries are in the register database** from wiring this up: `claude-integration-test-0001@example.com`, `claude-integration-test-0002@example.com` (rejected, 400), `cors-probe-0001@example.com`, `aanya.mactest@example.com`, `aanya.reveal@example.com` (counts 255–258). Delete them before launch.
 - [ ] **`backend-later/waitlist-route.ts` is now redundant** — the register API replaces it. Delete it, or keep it if you still want a server-side proxy.
 - [ ] **Cookies.** The Privacy Policy describes a cookie banner and refusable analytics and preference cookies. The site sets no cookies and has no banner. Build the banner, or narrow that clause.
 - [ ] **Photos.** Confirm a licence for each of the sixteen portraits.
