@@ -8,6 +8,7 @@ import { Header } from "@/components/Header";
 import { SectionRule } from "@/components/Ornaments";
 import { formatDate, getArticle, listArticles, relatedTo } from "@/lib/blog";
 import { COMPANY } from "@/lib/company";
+import { SHARE_IMAGE } from "@/lib/seo";
 import { SITE_NAME, absolute } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }: PageProps<"/blog/[slug]">): P
       publishedTime: article.published,
       modifiedTime: article.updated ?? article.published,
       authors: [article.author],
-      images: article.image ? [article.image] : undefined,
+      images: [article.image ?? SHARE_IMAGE],
     },
   };
 }

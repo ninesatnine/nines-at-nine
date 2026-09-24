@@ -76,6 +76,29 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 
 ## Change log
 
+### 2026-09-25 (latest) — a social share image
+
+The supplied `src/app/OG.png` (1200×628, the NINES AT NINE wordmark on
+oxblood) is now the preview card shown when a link to the site is shared.
+
+- **Renamed to `src/app/opengraph-image.png`,** with a copy as
+  `twitter-image.png` and alt text in the matching `.alt.txt` files. This is
+  Next's file convention: it emits `og:image` and `twitter:image` with type,
+  width, height and alt on every route, as absolute `https://ninesatnine.com/…`
+  URLs via `metadataBase`.
+- **The blog pages had to name it explicitly.** A page that sets its own
+  `openGraph` block replaces the inherited one, image included, so `/blog` and
+  every article were shipping `twitter:image` but no `og:image` — which is the
+  tag WhatsApp, Facebook and LinkedIn read. `SHARE_IMAGE` in `src/lib/seo.ts`
+  fills that in; an article with its own `image` in frontmatter still uses its
+  own.
+- Verified in `out/`: all 13 HTML pages carry exactly one `og:image` and one
+  `twitter:image`. Build, typecheck, lint clean; 63 tests passing.
+
+**Platforms cache previews.** A link already shared before this deploy keeps
+its old (imageless) card until re-scraped — use Facebook's Sharing Debugger or
+LinkedIn's Post Inspector to force a refresh.
+
 ### 2026-09-23 (latest) — a real favicon
 
 The icon Chrome showed in the tab, and that Google shows beside a search

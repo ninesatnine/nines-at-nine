@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { SectionRule } from "@/components/Ornaments";
 import { formatDate, listArticles } from "@/lib/blog";
+import { SHARE_IMAGE } from "@/lib/seo";
 import { absolute } from "@/lib/site";
 
 const TITLE = "Dating, With a Little More Thought.";
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
     description: INTRO,
     type: "website",
     url: absolute("/blog") ?? undefined,
+    images: [SHARE_IMAGE],
   },
 };
 
