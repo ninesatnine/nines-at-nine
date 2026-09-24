@@ -173,7 +173,7 @@ step** with its "Room in the City" and city-by-city framing. Marketing, not
 legal — left alone, and listed as an open item.
 
 The artifact uses `admin@ninesatnine.com` for every contact and its own footer
-carries `ninesatninehelp@gmail.com`. The site's `help@ninesatnine.com` and the
+carries `ninesatninehelp@gmail.com`. The site's `hello@ninesatnine.com` and the
 removed footer address are later changes the owner asked for, not drift.
 
 ### 2026-09-23 (latest) — homepage search metadata
@@ -388,7 +388,7 @@ The card's number is now real: it comes from `POST /register`.
   Terms and Privacy describe an online evening of one-to-one video rounds;
   the homepage describes a room in a city. Decide which is right and make the
   other match.
-- [ ] **Two contact addresses are in use.** The footer shows `help@ninesatnine.com`; every legal page says `admin@ninesatnine.com`. Both come from the prototype. Decide which is right.
+- [ ] **Two contact addresses are in use.** The footer shows `hello@ninesatnine.com`; every legal page says `admin@ninesatnine.com`. Both come from the prototype. Decide which is right.
 - [ ] **Two chips collapse to one value.** The API's gender enum is `male`/`female`/`other`, so "Non-binary" and "Prefer not to say" are indistinguishable once stored. Widen the enum if that difference matters.
 - [ ] **Add an OPTIONS route to the register API.** Without it the client must send `Content-Type: text/plain` to dodge the CORS preflight. Works, but it is a workaround.
 - [ ] **The endpoint is called from the browser,** so it is public and unauthenticated. Consider rate limiting or a token before launch.
