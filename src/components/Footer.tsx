@@ -14,7 +14,7 @@ export function Footer() {
               <span>NINES AT NINE</span>
             </Link>
             <p className="muted" style={{ fontSize: 15 }}>
-              Nine dates. One Friday. Three minutes each.
+            Nine Video Dates. One Friday. All Verified Singles.
             </p>
           </div>
           <nav className="foot-col" aria-label="Read">

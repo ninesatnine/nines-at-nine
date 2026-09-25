@@ -51,9 +51,11 @@ and redeploying. Changing it on the host alone does nothing.
 - **Page views,** including App Router navigations that don't reload the page
 - **Page leaves,** and time on page
 - **Sessions**
-- **Clicks** (autocapture), plus heatmap and dead-click data
-
-**Session replay is turned off on purpose.** See §5.
+- **Clicks** (autocapture) and dead clicks
+- **Heatmaps** (`enable_heatmaps: true`): clicks, rage clicks, mouse movement
+  and scroll depth. View them in PostHog → Heatmaps, or with the toolbar on
+  ninesatnine.com (already an authorized URL)
+- **Session replay,** with the form and the card blocked (see §5)
 
 ---
 
@@ -93,10 +95,14 @@ PostHog. Here is how that is enforced:
 1. **Every custom event takes only fixed, page-level fields.** There is no
    free-form "properties" parameter a call site could put personal data into.
    `src/lib/analytics.test.ts` pins down exactly what each event sends.
-2. **Session replay is disabled** (`disable_session_recording: true`). The
-   revealed card shows the visitor's name, gender and age, and a recording
-   would capture them. Leave it off, or turn it on only with text masking
-   **and** `ph-no-capture` respected.
+2. **Session replay blocks the form and the card.** The recorder treats
+   `ph-no-capture` as its block class, so a replay shows an empty box where
+   the waitlist form and the confirmation view (name, gender, age, toasts)
+   would be. Every input is masked too (`maskAllInputs`, in code and in the
+   project settings). The saved card is drawn on a canvas that is never put
+   on the page, so canvas recording cannot see it. **Any new element that
+   shows personal data must sit inside a `ph-no-capture` wrapper** and must
+   not be rendered through a portal outside it.
 3. **`ph-no-capture`** is on the waitlist form and on the confirmation view.
    Autocapture records nothing inside either, so neither a picked city nor a
    gender chip's label travels with a click.

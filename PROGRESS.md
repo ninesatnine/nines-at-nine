@@ -76,7 +76,20 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 
 ## Change log
 
-### 2026-09-25 (latest) — Meta Pixel on the homepage
+### 2026-09-25 (latest) — PostHog session replay and heatmaps on
+
+- `src/instrumentation-client.ts`: removed `disable_session_recording`,
+  added `enable_heatmaps: true` and `session_recording` with `maskAllInputs`
+  and `blockClass: "ph-no-capture"`. The form and the card are blocked from
+  replays, not just from autocapture.
+- Checked end to end against PostHog project 627257: `$pageview`,
+  `$autocapture`, `waitlist_button_clicked` (hero), `waitlist_form_started`,
+  a session recording and heatmap clicks all arrived from localhost.
+  `waitlist_completed` was not tested because it would write to the register
+  database.
+- Open: the Privacy Policy's analytics row doesn't mention session recording.
+
+### 2026-09-25 — Meta Pixel on the homepage
 
 Pixel `2548566402312132`, a **PageView on the homepage only**. Full notes,
 the Events Manager settings to check, and deployment steps are in
