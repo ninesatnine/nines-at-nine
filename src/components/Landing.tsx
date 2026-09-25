@@ -42,15 +42,29 @@ export function Landing() {
             <div className="wrap hero" id="top">
               <Image className="mark" src="/img/logo.png" alt="" width={186} height={240} priority />
               <h1>
-                The Best-Looking
+                Date the Hottest
                 <br />
-                Room in the City.
+                Singles in Town.
               </h1>
               <DiamondRule />
-              <p className="lede">Nine dates. One Friday. <span className="wrap-mobile">Three minutes each.</span></p>
-              <a className="btn" id="heroCta" href="#waitlist" onClick={() => trackWaitlistClick("hero")}>
-                Join the waitlist
-              </a>
+              <p className="lede">Nine Video Dates. One Friday. <span className="wrap-mobile">All Verified.</span></p>
+              <a
+  className="btn"
+  id="heroCta"
+  href="#waitlist"
+  onClick={() => trackWaitlistClick("hero")}
+  style={{
+    paddingLeft: "3.5em",
+    paddingRight: "3.5em",
+    paddingTop: "0.2em",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    lineHeight: 1,
+  }}
+>
+  I Want In
+</a>
              
             </div>
 

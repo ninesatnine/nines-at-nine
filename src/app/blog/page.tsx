@@ -77,7 +77,7 @@ export default function BlogIndex() {
               announced — the waitlist is how you hear first.
             </p>
             <Link className="btn" href="/#waitlist">
-              Join the waitlist
+              I Want In
             </Link>
           </section>
         </div>

@@ -68,7 +68,7 @@ export function Dock({ active }: { active: boolean }) {
         tabIndex={-1}
         onClick={() => trackWaitlistClick("dock")}
       >
-        Join the waitlist
+        I Want In
       </a>
     </div>
   );

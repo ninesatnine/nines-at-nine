@@ -56,7 +56,7 @@ export function Header({ hideNav = false }: { hideNav?: boolean }) {
             </Link>
           ))}
           <Link className="btn" href="/#waitlist" onClick={() => trackWaitlistClick("navbar")}>
-            Join the waitlist
+            I Want In
           </Link>
         </nav>
         <button
@@ -88,7 +88,7 @@ export function Header({ hideNav = false }: { hideNav?: boolean }) {
           </Link>
         ))}
         <Link href="/#waitlist" onClick={() => trackWaitlistClick("navbar")}>
-          Join the waitlist
+        I Want In
         </Link>
       </nav>
     </header>

@@ -176,15 +176,19 @@ export function WaitlistForm({ onJoined }: { onJoined: (joined: Joined) => void 
             if (touched.consent) check(next);
           }}
         />
-        <label htmlFor="consent">I’m 18 or older and would like updates about Nines at Nine.</label>
+        <label htmlFor="consent">I am 18+ and want Early Access Updates.</label>
       </div>
       <span className="check-err" id="consentErr" hidden={!bad("consent")}>
         {errors.consent}
       </span>
 
       <button className="btn block" id="formCta" type="submit">
-        Join the waitlist
+      I Want In
       </button>
+
+      <small style={{ display: "block", textAlign: "center" }}>
+  Your details are confidential and never shared with anyone.
+</small>
       
     </form>
   );
