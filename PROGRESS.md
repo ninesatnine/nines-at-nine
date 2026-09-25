@@ -76,6 +76,50 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 
 ## Change log
 
+### 2026-09-25 (latest) — Meta Pixel on the homepage
+
+Pixel `2548566402312132`, a **PageView on the homepage only**. Full notes,
+the Events Manager settings to check, and deployment steps are in
+`META_PIXEL_SETUP.md`.
+
+- **No existing pixel, tag manager or `fbq` was in the repo,** so this is a
+  fresh install and cannot double-fire.
+- **`src/lib/meta-pixel.ts`** holds Meta's base code as TypeScript (the
+  `fbq` queue stub), and **`src/components/MetaPixel.tsx`** loads
+  fbevents.js with `next/script` (`afterInteractive`,
+  `id="meta-pixel-fbevents"`). Only `src/app/page.tsx` renders it, and it
+  stays a Server Component. No new dependency.
+- **Production hosts only:** `ninesatnine.com` and `www`, checked at runtime.
+  Localhost and previews are excluded; `NEXT_PUBLIC_META_PIXEL_TEST_HOSTS`
+  opts a host in for testing. No id = no pixel.
+- **Scope, from reading the live fbevents.js:** `disablePushState` stops
+  Meta's automatic PageView on every client-side navigation. `autoConfig`
+  off stops automatic click and metadata events. `allowDuplicatePageViews`
+  lets a genuine return to `/` count, which Meta would otherwise drop.
+  Consent is revoked when the homepage unmounts, because Meta fires an
+  unswitchable PageView on back-forward-cache restores; its replay queue is
+  cleared before the next grant.
+- **No `<noscript>` image.** A static export cannot check consent or the host
+  in fixed HTML, so the fallback would bypass both.
+- **Verified in Chrome** against a local build with localhost allowed. These
+  were real requests to Meta, not a confirmation in Events Manager:
+  - loading `/blog` directly never loads fbevents.js
+  - loading `/` sends one `tr` request with `id=2548566402312132`,
+    `ev=PageView` and no `ud[...]` fields
+  - rerenders, the menu, the `#waitlist` jump and typing send nothing
+  - navigating client-side to `/blog` sends nothing
+  - each return to `/` (link, Forward) sends exactly one; Back to `/blog`
+    sends nothing
+  - PostHog kept sending (200s)
+  - with fbevents.js broken, the page and PostHog worked, with no console
+    errors
+- 74 tests passing, up from 66. Build, typecheck and lint clean.
+
+**Blocker before going live — the Privacy Policy says the opposite.**
+Clause 14: *"We do not use advertising or cross-site tracking cookies."*
+Clause 7: data is not shared *"for anyone else's advertising."* The pixel sets
+`_fbp`. Nothing is live until `NEXT_PUBLIC_META_PIXEL_ID` is added on Vercel.
+
 ### 2026-09-25 (latest) — PostHog analytics
 
 Integrated by hand with the App Router method, not the wizard. Full notes,
@@ -441,6 +485,11 @@ The card's number is now real: it comes from `POST /register`.
 - [x] **Choose an analytics vendor.** PostHog, 25 September 2026.
 - [ ] **Paste the PostHog project token** into `.env.local` and into Vercel's
   environment variables, then redeploy. Until then PostHog is off.
+- [ ] **Update the Privacy Policy before enabling the Meta Pixel.** Clauses 7
+  and 14 deny advertising and cross-site tracking cookies. Then add
+  `NEXT_PUBLIC_META_PIXEL_ID` in Vercel (Production) and redeploy without the
+  build cache. Also turn off Automatic advanced matching and automatic event
+  setup in Events Manager (`META_PIXEL_SETUP.md` §4).
 - [ ] **Analytics now sets a cookie.** PostHog's `ph_<token>_posthog` is the
   first cookie the site sets. Decide whether a consent banner is required
   under DPDP before turning the token on in production — see the Cookies item

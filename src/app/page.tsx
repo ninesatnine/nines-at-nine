@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { Landing } from "@/components/Landing";
+import { MetaPixel } from "@/components/MetaPixel";
 import { HOME_DESCRIPTION, HOME_TITLE } from "@/lib/seo";
 import { absolute } from "@/lib/site";
 
@@ -30,5 +31,11 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <Landing />;
+  return (
+    <>
+      <Landing />
+      {/* Homepage only, by design — see META_PIXEL_SETUP.md. */}
+      <MetaPixel />
+    </>
+  );
 }

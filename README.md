@@ -132,6 +132,7 @@ To use a database directly instead, implement the `WaitlistStore` interface and 
 | `src/lib/site.ts` | The production origin (`NEXT_PUBLIC_SITE_URL`), and absolute URLs |
 | `src/lib/analytics.ts` | The analytics events, sent to PostHog — see `POSTHOG_SETUP.md` |
 | `src/instrumentation-client.ts` | Starts PostHog in the browser, when a token is set |
+| `src/lib/meta-pixel.ts`, `src/components/MetaPixel.tsx` | Meta Pixel PageView, homepage and production hosts only — see `META_PIXEL_SETUP.md` |
 | `docs/SEO.md` | SEO audit, query map, claim/source log, measurement, 30/60/90 |
 | `public/img/` | The logo and the sixteen reel portraits |
 
