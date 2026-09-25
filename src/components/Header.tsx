@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { trackWaitlistClick } from "@/lib/analytics";
+
 const LINKS = [
   { href: "/#experience", label: "The experience" },
   { href: "/#how-it-works", label: "How it works" },
@@ -53,7 +55,7 @@ export function Header({ hideNav = false }: { hideNav?: boolean }) {
               {l.label}
             </Link>
           ))}
-          <Link className="btn" href="/#waitlist">
+          <Link className="btn" href="/#waitlist" onClick={() => trackWaitlistClick("navbar")}>
             Join the waitlist
           </Link>
         </nav>
@@ -85,7 +87,9 @@ export function Header({ hideNav = false }: { hideNav?: boolean }) {
             {l.label}
           </Link>
         ))}
-        <Link href="/#waitlist">Join the waitlist</Link>
+        <Link href="/#waitlist" onClick={() => trackWaitlistClick("navbar")}>
+          Join the waitlist
+        </Link>
       </nav>
     </header>
   );

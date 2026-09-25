@@ -25,7 +25,7 @@ What existed before this work, with file evidence.
 | `metadataBase` | **absent** | `layout.tsx` metadata block | set when origin is configured |
 | Structured data | **none** | no `ld+json` anywhere | Organization, BlogPosting, BreadcrumbList |
 | Per-page metadata | title/description on each page | route files | unchanged; blog routes added |
-| Analytics | **none** | no vendor script, no events | event seam in `src/lib/analytics.ts` |
+| Analytics | **none** | no vendor script, no events | PostHog, via `src/lib/analytics.ts` (see `POSTHOG_SETUP.md`) |
 | Editorial content | none | — | 6 articles, ~7,600 words |
 
 **Not run, and not claimable:** Lighthouse scores, Search Console data, live
@@ -86,7 +86,7 @@ be cargo cult).
 - `src/lib/site.ts` — the production origin, as configuration.
 - `src/app/blog/page.tsx`, `src/app/blog/[slug]/page.tsx` — index and article.
 - `src/app/sitemap.ts`, `src/app/robots.ts`.
-- `src/lib/analytics.ts`, `src/components/BlogAnalytics.tsx` — the event seam.
+- `src/lib/analytics.ts`, `src/components/BlogAnalytics.tsx` — the event seam, now sending to PostHog.
 - Footer "READ → Blog" link, a real `<a>` via `next/link`.
 
 **Content is fully server-rendered.** Verified in `out/`: an article's prose,
@@ -157,18 +157,21 @@ Events, defined in `src/lib/analytics.ts`:
 
 | Event | Fires when | Properties |
 | --- | --- | --- |
-| `blog_view` | An article renders, once per article | `slug`, `topic` |
-| `blog_waitlist_click` | A waitlist link on an article is clicked | `slug`, `topic`, `placement` |
-| `waitlist_success` | **After the API confirms** the entry | none |
+| `blog_opened` | An article renders, once per article | `article_slug`, `article_topic` |
+| `waitlist_button_clicked` | A "Join the waitlist" button or link is pressed | `location` (`hero`, `navbar`, `dock`, `blog`); `article_slug` for `blog` |
+| `waitlist_form_started` | First focus on the waitlist form | none |
+| `waitlist_completed` | **After the API confirms** the entry | `source: "website"` |
 
 Rules the code enforces: **no personal data ever** — no name, email or
-application answer, only slug/topic/placement; nothing is sent while
-`window.__consent === false`; `blog_view` is ref-guarded so React's development
-double-invoke cannot double-count; `waitlist_success` fires after the API
+application answer, only page-level fields; nothing is sent while
+`window.__consent === false`; `blog_opened` is ref-guarded so React's development
+double-invoke cannot double-count; `waitlist_completed` fires after the API
 responds, never on the button press.
 
-There is no analytics vendor yet. `track()` hands events to `window.dataLayer`
-if present and otherwise does nothing, so adding a vendor is a script tag.
+The vendor is **PostHog** (since 25 September 2026), which also records page
+views, sessions and clicks on its own. Setup, privacy measures and how to
+verify are in `POSTHOG_SETUP.md`. It stays off until
+`NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is set.
 
 ### What to report, kept separate
 
@@ -197,7 +200,7 @@ one location on one day. Record it as that.
    sitemap and no canonical tags. Highest priority.
 2. **Search Console and Bing Webmaster Tools** — verify the domain, submit the
    sitemap. Cannot be done from the repository.
-3. **Analytics vendor** — pick one, add the script. The events are ready.
+3. **Analytics token** — PostHog is integrated; set `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` on the host (`POSTHOG_SETUP.md` §6).
 4. **Cities and dates.** Still unannounced, so every article is
    geography-neutral and no city pages exist. This is also an open item in
    `PROGRESS.md` regarding the Privacy Policy's cookie banner.
@@ -207,8 +210,9 @@ one location on one day. Record it as that.
    OpenAI's `OAI-SearchBot` (search) is separate from `GPTBot` (training):
    blocking training does **not** require blocking search. Neither is blocked
    in `robots.ts` today.
-7. **Consent banner**, if analytics require one under DPDP. `track()` already
-   respects `window.__consent`.
+7. **Consent banner**, if analytics require one under DPDP. PostHog sets a
+   first-party cookie; the helpers and `posthog.init` already respect
+   `window.__consent`.
 
 ---
 
@@ -246,7 +250,7 @@ to those.
 **Days 1–30 — ship and establish a baseline**
 - Set `NEXT_PUBLIC_SITE_URL`; confirm sitemap and canonicals in production.
 - Verify in Search Console and Bing Webmaster Tools; submit the sitemap.
-- Add the analytics vendor; confirm all three events fire.
+- Set the PostHog token; confirm all four custom events arrive.
 - Check live crawler access (no CDN/WAF block); check the deployed pages return
   200 and are indexable.
 - Read all six articles end to end against §5 before launch.

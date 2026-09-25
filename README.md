@@ -130,7 +130,8 @@ To use a database directly instead, implement the `WaitlistStore` interface and 
 | `content/blog/*.md` | The six articles — Markdown with YAML frontmatter |
 | `src/lib/blog.ts` | Reads and renders them at build time |
 | `src/lib/site.ts` | The production origin (`NEXT_PUBLIC_SITE_URL`), and absolute URLs |
-| `src/lib/analytics.ts` | The analytics event seam — no vendor wired up yet |
+| `src/lib/analytics.ts` | The analytics events, sent to PostHog — see `POSTHOG_SETUP.md` |
+| `src/instrumentation-client.ts` | Starts PostHog in the browser, when a token is set |
 | `docs/SEO.md` | SEO audit, query map, claim/source log, measurement, 30/60/90 |
 | `public/img/` | The logo and the sixteen reel portraits |
 

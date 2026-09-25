@@ -154,7 +154,7 @@ export default async function ArticlePage({ params }: PageProps<"/blog/[slug]">)
               Nines at Nine is a curated speed-dating evening. Dates and cities haven’t been
               announced yet — joining the waitlist is how you hear first.
             </p>
-            <Link className="btn" href="/#waitlist" data-analytics="blog_waitlist_click">
+            <Link className="btn" href="/#waitlist">
               Join the waitlist
             </Link>
           </section>

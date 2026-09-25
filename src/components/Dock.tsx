@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { trackWaitlistClick } from "@/lib/analytics";
+
 type DockState = "hidden" | "show" | "merged";
 
 /**
@@ -60,7 +62,12 @@ export function Dock({ active }: { active: boolean }) {
   return (
     <div className={className} aria-hidden="true">
       <span className="dock-line">Nine dates. One Friday.</span>
-      <a className="btn dock-btn" href="#waitlist" tabIndex={-1}>
+      <a
+        className="btn dock-btn"
+        href="#waitlist"
+        tabIndex={-1}
+        onClick={() => trackWaitlistClick("dock")}
+      >
         Join the waitlist
       </a>
     </div>

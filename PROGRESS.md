@@ -76,6 +76,40 @@ Company identity and document version live in one place (`src/lib/company.ts`): 
 
 ## Change log
 
+### 2026-09-25 (latest) — PostHog analytics
+
+Integrated by hand with the App Router method, not the wizard. Full notes,
+event list and deployment steps are in `POSTHOG_SETUP.md`.
+
+- **`posthog-js`** installed; started in **`src/instrumentation-client.ts`**
+  with `defaults: "2026-05-30"`, which gives page views (including client-side
+  navigations), page leaves, sessions and click autocapture.
+- **Off without a token.** `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` is empty in
+  `.env.local` for the owner to fill in; unset, nothing is loaded or sent.
+  `NEXT_PUBLIC_POSTHOG_HOST` defaults to `https://us.i.posthog.com`.
+- **`src/lib/analytics.ts` rewritten** from a `dataLayer` seam to typed PostHog
+  helpers — the only place `posthog.capture` is called. Events:
+  `waitlist_button_clicked` (`location`: hero, navbar, dock, blog),
+  `waitlist_form_started`, `waitlist_completed` (after the API confirms,
+  replacing `waitlist_success`) and `blog_opened` (replacing `blog_view`).
+  `blog_waitlist_click` folded into `waitlist_button_clicked` with
+  `location: blog`.
+- **No footer CTA exists,** so there is no `footer` event yet; the value is
+  reserved. The phone join bar is tracked as `dock`, a fifth location.
+- **The article's click listener is scoped to `<main>`,** so on blog pages the
+  header button reports once, as `navbar`, not twice.
+- **Privacy:** session replay off (the card shows name, gender and age);
+  `ph-no-capture` on the form and the confirmation view so autocapture records
+  no city or gender text; no `identify`; `window.__consent === false` starts
+  PostHog opted out. The unused `data-analytics` attribute on the article CTA
+  was removed. No visible markup, styling or copy changed.
+- **Verified in Chrome** against a build with a dummy token and the register
+  API stubbed (no real entry created): `$pageview`, `waitlist_button_clicked`,
+  `waitlist_form_started`, `waitlist_completed` and `blog_opened` all send, in
+  order, with no hydration or console errors beyond the dummy token's 401.
+- Build, typecheck and lint clean; 66 tests passing, up from 63 — the new
+  `analytics.test.ts` pins the exact properties of every event.
+
 ### 2026-09-25 (latest) — a social share image
 
 The supplied `src/app/OG.png` (1200×628, the NINES AT NINE wordmark on
@@ -404,8 +438,13 @@ The card's number is now real: it comes from `POST /register`.
   is no sitemap and no canonical tags — see `docs/SEO.md` §4 and §7.
 - [ ] **Verify the domain in Search Console and Bing Webmaster Tools,** and
   submit the sitemap. Cannot be done from the repository.
-- [ ] **Choose an analytics vendor.** The events exist and fire; nothing
-  receives them yet.
+- [x] **Choose an analytics vendor.** PostHog, 25 September 2026.
+- [ ] **Paste the PostHog project token** into `.env.local` and into Vercel's
+  environment variables, then redeploy. Until then PostHog is off.
+- [ ] **Analytics now sets a cookie.** PostHog's `ph_<token>_posthog` is the
+  first cookie the site sets. Decide whether a consent banner is required
+  under DPDP before turning the token on in production — see the Cookies item
+  above and `POSTHOG_SETUP.md` §5.
 - [ ] **Read the six articles before launch** against the claim log in
   `docs/SEO.md` §5.
 - [ ] **Version control.** All work since the initial Create Next App commit is uncommitted.

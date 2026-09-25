@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from "react";
 
-import { track } from "@/lib/analytics";
+import { trackBlogOpened, trackWaitlistClick } from "@/lib/analytics";
 
-/** One `blog_view` per article, and a click event for the waitlist links on it. */
+/** One `blog_opened` per article, and a click event for the waitlist links on it. */
 export function BlogAnalytics({ slug, topic }: { slug: string; topic: string }) {
   const counted = useRef(false);
 
@@ -13,18 +13,15 @@ export function BlogAnalytics({ slug, topic }: { slug: string; topic: string }) 
     // double-invoke does not report two views for one read.
     if (counted.current) return;
     counted.current = true;
-    track("blog_view", { slug, topic });
+    trackBlogOpened(slug, topic);
   }, [slug, topic]);
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      const link = (e.target as HTMLElement | null)?.closest?.("a[href*='#waitlist']");
+      // Only links in the article itself: the header's button reports as "navbar".
+      const link = (e.target as HTMLElement | null)?.closest?.("main a[href*='#waitlist']");
       if (!link) return;
-      track("blog_waitlist_click", {
-        slug,
-        topic,
-        placement: link.getAttribute("data-analytics") ? "article_footer" : "article_body",
-      });
+      trackWaitlistClick("blog", slug);
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);

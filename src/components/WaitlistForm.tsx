@@ -13,6 +13,7 @@ import {
   titleCase,
   validate,
 } from "@/lib/waitlist";
+import { trackWaitlistStarted } from "@/lib/analytics";
 
 /** What page one collects. The waitlist number is not known until the card is saved. */
 export type Joined = { name: string; email: string; city: string };
@@ -29,6 +30,7 @@ export function WaitlistForm({ onJoined }: { onJoined: (joined: Joined) => void 
   const emailRef = useRef<HTMLInputElement>(null);
   const cityRef = useRef<HTMLInputElement>(null);
   const consentRef = useRef<HTMLInputElement>(null);
+  const started = useRef(false);
 
   function check(next: typeof values) {
     const found = validate(normalizeInput(next));
@@ -74,7 +76,19 @@ export function WaitlistForm({ onJoined }: { onJoined: (joined: Joined) => void 
   const bad = (field: WaitlistField) => Boolean(touched[field] && errors[field]);
 
   return (
-    <form className="form" id="joinForm" noValidate onSubmit={onSubmit}>
+    <form
+      // ph-no-capture keeps autocapture from recording what is typed or picked here.
+      className="form ph-no-capture"
+      id="joinForm"
+      noValidate
+      onSubmit={onSubmit}
+      onFocus={() => {
+        // Focus bubbles in React, so the first field touched counts, once.
+        if (started.current) return;
+        started.current = true;
+        trackWaitlistStarted();
+      }}
+    >
       <p className="req-note">All fields are required.</p>
 
       <div className={`field${bad("firstName") ? " invalid" : ""}`}>

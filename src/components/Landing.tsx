@@ -11,6 +11,7 @@ import { Header } from "@/components/Header";
 import { DiamondRule, SectionRule, StepMark } from "@/components/Ornaments";
 import { Reel } from "@/components/Reel";
 import { type Joined, WaitlistForm } from "@/components/WaitlistForm";
+import { trackWaitlistClick } from "@/lib/analytics";
 
 const FACTS = [
   { title: "Nine dates", body: "A chance to meet someone beyond a profile." },
@@ -47,7 +48,7 @@ export function Landing() {
               </h1>
               <DiamondRule />
               <p className="lede">Nine dates. One Friday. <span className="wrap-mobile">Three minutes each.</span></p>
-              <a className="btn" id="heroCta" href="#waitlist">
+              <a className="btn" id="heroCta" href="#waitlist" onClick={() => trackWaitlistClick("hero")}>
                 Join the waitlist
               </a>
               <small>An invitation starts here.</small>

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 import { useToast } from "@/components/Toast";
-import { track } from "@/lib/analytics";
+import { trackWaitlistCompleted } from "@/lib/analytics";
 import type { Joined } from "@/components/WaitlistForm";
 import { RegisterError, register } from "@/lib/register";
 
@@ -100,7 +100,7 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
       setCount(place);
       // Counted only here, after the API confirmed the entry — never on the
       // button press, which would overcount every rejected submit.
-      track("waitlist_success");
+      trackWaitlistCompleted();
     } catch (err) {
       toast(err instanceof RegisterError ? err.message : "Something went wrong. Please try again.");
     } finally {
@@ -132,7 +132,8 @@ export function ConfirmationView({ joined, onBack }: { joined: Joined; onBack: (
   }
 
   return (
-    <div className="wrap confirm">
+    // ph-no-capture: the card shows name, gender and age, which must never reach analytics.
+    <div className="wrap confirm ph-no-capture">
       <div className="confirm-top">
         <h1 ref={heading} tabIndex={-1}>
           You’re in, {joined.name}.
