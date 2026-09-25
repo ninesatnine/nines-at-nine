@@ -1,7 +1,7 @@
 const QUESTIONS = [
   {
     q: "What is Nines at Nine?",
-    a: "A curated speed-dating evening. Nine dates, three minutes each, all on one Friday — a room of people chosen to meet each other.",
+    a: "A curated speed-dating evening. Nine dates, three minutes each, all on one Friday, with a room of people chosen to meet each other.",
   },
   {
     q: "How does the evening work?",
@@ -17,7 +17,7 @@ const QUESTIONS = [
   },
   {
     q: "What does the application ask for?",
-    a: "One photograph — the one you’d want a stranger to see first — and one line that sounds like you. You’ll complete it when invitations open.",
+    a: "One photograph, the one you’d want a stranger to see first, and one line that sounds like you. You’ll complete it when invitations open.",
   },
   {
     q: "Does joining the waitlist guarantee a place?",
@@ -29,7 +29,7 @@ const QUESTIONS = [
   },
   {
     q: "How will I hear from you?",
-    a: "By email, at the address you give us, with updates about Nines at Nine — starting with when applications open.",
+    a: "By email, at the address you give us, with updates about Nines at Nine, starting with when applications open.",
   },
 ];
 

@@ -149,7 +149,7 @@ export function WaitlistForm({ onJoined }: { onJoined: (joined: Joined) => void 
           }}
         />
         <span className="help" id="cityHelp">
-          Rooms open city by city. This tells us where to start.
+          {/* Rooms open city by city. This tells us where to start. */}
         </span>
         <span className="err" id="cityErr" hidden={!bad("city")}>
           {errors.city}

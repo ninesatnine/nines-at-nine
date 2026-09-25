@@ -51,7 +51,7 @@ export function Landing() {
               <a className="btn" id="heroCta" href="#waitlist" onClick={() => trackWaitlistClick("hero")}>
                 Join the waitlist
               </a>
-              <small>An invitation starts here.</small>
+             
             </div>
 
             <Reel />
